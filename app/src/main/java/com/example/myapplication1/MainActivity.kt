@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.media.MediaRecorder
+import android.opengl.Visibility
 import android.os.*
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -14,9 +16,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.example.myapplication1.databinding.ActivityMainBinding
+import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 const val REQUEST_CODE = 300
@@ -24,6 +28,8 @@ const val REQUEST_CODE = 300
 class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     private var permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
     private var permissionGranted = false
+
+    private lateinit var amplitudes: ArrayList<Float>
 
     private lateinit var binding: ActivityMainBinding
 
@@ -65,6 +71,24 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             vibrator.vibrate(VibrationEffect.createOneShot(50,VibrationEffect.DEFAULT_AMPLITUDE))
         }
 
+        binding.btnList.setOnClickListener{
+            //TODO
+            Toast.makeText(this,"List button", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnDone.setOnClickListener{
+            stopRecording()
+            //TODO
+            Toast.makeText(this,"Record saved", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnDelete.setOnClickListener{
+            stopRecording()
+            File("$dirPath$filename.mp3")
+            Toast.makeText(this,"Record deleted", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnDelete.isClickable = false
     }
 
 
@@ -131,10 +155,37 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         binding.waveformView2.start()
 
         timer.start()
+
+        binding.btnDelete.isClickable = true
+        binding.btnDelete.setImageResource(R.drawable.ic_delete)
+
+        binding.btnDone.visibility = View.VISIBLE
+        binding.btnList.visibility = View.GONE
     }
 
     private fun stopRecording(){
         timer.stop()
+
+        recorder.apply {
+            stop()
+            release()
+        }
+
+        isPaused = false
+        isRecording = false
+
+        binding.btnList.visibility = View.VISIBLE
+        binding.btnDone.visibility= View.GONE
+
+        binding.btnDelete.isClickable = false
+        binding.btnDelete.setImageResource(R.drawable.ic_delete_disabled)
+
+        binding.btnRecord.setImageResource(R.drawable.ic_record)
+
+        binding.tvTimer.text = "00:00.00"
+
+        amplitudes = binding.waveformView1.clear()
+        binding.waveformView2.clear()
     }
 
     override fun onTimerTick(duration: String) {

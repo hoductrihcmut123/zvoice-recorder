@@ -27,6 +27,11 @@ class WaveformViewRight(context: Context?, attrs: AttributeSet?) : View(context,
         invalidate()
     }
 
+    fun clear(){
+        maxSpikes = 0
+        invalidate()
+    }
+
     override fun draw(canvas: Canvas?) {
         super.draw(canvas)
 

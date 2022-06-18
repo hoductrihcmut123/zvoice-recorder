@@ -79,6 +79,7 @@
 
         <ImageButton
             android:id="@+id/btnList"
+            android:visibility="visible"
             android:layout_width="@dimen/btn_size"
             android:layout_height="@dimen/btn_size"
             android:background="@drawable/ic_ripple"
@@ -86,11 +87,11 @@
 
         <ImageButton
             android:id="@+id/btnDone"
+            android:visibility="gone"
             android:layout_width="@dimen/btn_size"
             android:layout_height="@dimen/btn_size"
             android:background="@drawable/ic_ripple"
-            android:src="@drawable/ic_done"
-            android:visibility="gone" />
+            android:src="@drawable/ic_done" />
 
 
     </LinearLayout>
