@@ -3,6 +3,7 @@ package com.example.myapplication1
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Canvas
 import android.media.MediaRecorder
 import android.os.*
 import android.util.Log
@@ -127,6 +128,8 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         isRecording = true
         isPaused = false
 
+        binding.waveformView2.start()
+
         timer.start()
     }
 
@@ -136,5 +139,6 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
     override fun onTimerTick(duration: String) {
         binding.tvTimer.text = duration
+        binding.waveformView1.addAmplitude(recorder.maxAmplitude.toFloat())
     }
 }

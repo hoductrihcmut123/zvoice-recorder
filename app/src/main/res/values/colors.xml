@@ -12,6 +12,7 @@
     <color name="gray">#ECECEC</color>
     <color name="grayDark">#656565</color>
     <color name="grayDarkDisable">#8F8F8F</color>
+    <color name="lightGray">#F8F8F8</color>
 
     <color name="statusBar">#E4E2E2</color>
     <color name="colorText">#FF000000</color>
