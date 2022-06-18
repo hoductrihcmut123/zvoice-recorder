@@ -1,100 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tvTimer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00.00"
-        android:textSize="46sp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutWaveform"
-        app:layout_constraintVertical_bias="0.25" />
-
-
-    <LinearLayout
-        android:id="@+id/linearLayoutWaveform"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="830px"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25">
+        android:layout_height="match_parent">
 
-        <com.example.myapplication1.WaveformView
-            android:id="@+id/waveformView1"
-            android:layout_width="0dp"
-            android:layout_height="800px"
-            android:layout_weight="2"
-            android:background="@color/lightGray" />
+        <TextView
+            android:id="@+id/tvTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00.00"
+            android:textSize="46sp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayoutWaveform"
+            app:layout_constraintVertical_bias="0.25" />
 
-        <com.example.myapplication1.RedLineView
-            android:id="@+id/LineView"
-            android:layout_width="20px"
+
+        <LinearLayout
+            android:id="@+id/linearLayoutWaveform"
+            android:layout_width="match_parent"
             android:layout_height="830px"
-            android:background="@color/lightGray" />
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25">
 
-        <com.example.myapplication1.WaveformViewRight
-            android:id="@+id/waveformView2"
-            android:layout_width="0dp"
-            android:layout_height="800px"
-            android:layout_weight="1"
-            android:background="@color/lightGray" />
+            <com.example.myapplication1.WaveformView
+                android:id="@+id/waveformView1"
+                android:layout_width="0dp"
+                android:layout_height="800px"
+                android:layout_weight="2"
+                android:background="@color/lightGray" />
 
-    </LinearLayout>
+            <com.example.myapplication1.RedLineView
+                android:id="@+id/LineView"
+                android:layout_width="20px"
+                android:layout_height="830px"
+                android:background="@color/lightGray" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+            <com.example.myapplication1.WaveformViewRight
+                android:id="@+id/waveformView2"
+                android:layout_width="0dp"
+                android:layout_height="800px"
+                android:layout_weight="1"
+                android:background="@color/lightGray" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.9">
+
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="@dimen/btn_size"
+                android:layout_height="@dimen/btn_size"
+                android:background="@drawable/ic_ripple"
+                android:src="@drawable/ic_delete_disabled" />
+
+            <ImageButton
+                android:id="@+id/btnRecord"
+                android:layout_width="66dp"
+                android:layout_height="66dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:background="@drawable/ic_record"
+                android:src="@drawable/ic_mic" />
+
+            <ImageButton
+                android:id="@+id/btnList"
+                android:layout_width="@dimen/btn_size"
+                android:layout_height="@dimen/btn_size"
+                android:background="@drawable/ic_ripple"
+                android:src="@drawable/ic_list"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/btnDone"
+                android:layout_width="@dimen/btn_size"
+                android:layout_height="@dimen/btn_size"
+                android:background="@drawable/ic_ripple"
+                android:src="@drawable/ic_done"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/bottomSheetBG"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9">
+        android:layout_height="match_parent"
+        android:background="@color/opaqueBG"/>
 
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="@dimen/btn_size"
-            android:layout_height="@dimen/btn_size"
-            android:background="@drawable/ic_ripple"
-            android:src="@drawable/ic_delete_disabled" />
+    <include layout="@layout/bottom_sheet"/>
 
-        <ImageButton
-            android:id="@+id/btnRecord"
-            android:layout_width="66dp"
-            android:layout_height="66dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-            android:background="@drawable/ic_record"
-            android:src="@drawable/ic_mic" />
-
-        <ImageButton
-            android:id="@+id/btnList"
-            android:visibility="visible"
-            android:layout_width="@dimen/btn_size"
-            android:layout_height="@dimen/btn_size"
-            android:background="@drawable/ic_ripple"
-            android:src="@drawable/ic_list" />
-
-        <ImageButton
-            android:id="@+id/btnDone"
-            android:visibility="gone"
-            android:layout_width="@dimen/btn_size"
-            android:layout_height="@dimen/btn_size"
-            android:background="@drawable/ic_ripple"
-            android:src="@drawable/ic_done" />
-
-
-    </LinearLayout>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
