@@ -36,10 +36,10 @@ class WaveformViewRight(context: Context?, attrs: AttributeSet?) : View(context,
         super.draw(canvas)
 
         for(i in (0..maxSpikes)){
-            var left = screenWidth - i*(width + distance)
-            var top = screenHeight/2 - 30/2
-            var right = left + width
-            var bottom = top + 30
+            val left = screenWidth - i*(width + distance)
+            val top = screenHeight/2 - 30/2
+            val right = left + width
+            val bottom = top + 30
             canvas?.drawRoundRect(RectF(left, top, right, bottom), radius, radius, paint)
         }
     }

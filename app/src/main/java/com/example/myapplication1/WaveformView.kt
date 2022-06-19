@@ -27,17 +27,17 @@ class WaveformView(context: Context?, attrs: AttributeSet?) : View(context, attr
     }
 
     fun addAmplitude(amp: Float){
-        var normal = (amp/24).coerceAtMost(screenHeight)     // handle when the value of Amplitude > screen Height
+        val normal = (amp/24).coerceAtMost(screenHeight)     // handle when the value of Amplitude > screen Height
         amplitudes.add(normal)
 
         spikes.clear()
 
-        var amps = amplitudes.takeLast(maxSpikes).reversed()      // get the last element maxSpikes to make the animation run
+        val amps = amplitudes.takeLast(maxSpikes).reversed()      // get the last element maxSpikes to make the animation run
         for(i in amps.indices){
-            var left = screenWidth - i*(width + distance)
-            var top = screenHeight/2 - (amps[i] + 20)/2
-            var right = left + width
-            var bottom = top + amps[i] + 20
+            val left = screenWidth - i*(width + distance)
+            val top = screenHeight/2 - (amps[i] + 20)/2
+            val right = left + width
+            val bottom = top + amps[i] + 20
             spikes.add(RectF(left, top, right, bottom))
         }
 
