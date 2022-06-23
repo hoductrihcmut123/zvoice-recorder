@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.os.*
+import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -14,12 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.myapplication1.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import java.io.File
-import java.io.IOException
+import kotlinx.coroutines.GlobalScope
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-
+import kotlinx.coroutines.launch
 
 const val REQUEST_CODE = 300
 
@@ -36,12 +38,15 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     private var filename = ""
     private var isRecording = false
     private var isPaused = false
+    private var duration = ""
 
     private lateinit var timer: Timer
 
     private lateinit var vibrator: Vibrator
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
+    private lateinit var sqLiteHelper: SQLiteHelper
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +71,8 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.peekHeight = 0
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        sqLiteHelper = SQLiteHelper(this)
 
         binding.btnRecord.setOnClickListener {
             when {
@@ -124,6 +131,27 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             File("$dirPath$filename.mp3").renameTo(newFile)     // put contents of old file to newFile and remove old file
         }
 
+        var filePath = "$dirPath$newFilename.mp3"
+        var timestamp = Date().time.toInt()
+        var ampsPath = "$dirPath$newFilename"
+
+        try {
+            var fos = FileOutputStream(ampsPath)
+            var out = ObjectOutputStream(fos)
+            out.writeObject(amplitudes)
+            fos.close()
+            out.close()
+        }catch (e: IOException){}
+
+        val ar = AudioRecordModel(filename = filename, filePath = filePath, timestamp = timestamp, duration = duration, ampsPath = ampsPath)
+        GlobalScope.launch{
+            val status = sqLiteHelper.insertAudioRecord(ar)
+            if(status > -1){
+                Log.e("test", "Audio Record added")
+            } else {
+                Log.e("test", "Audio Record not saved")
+            }
+        }
     }
 
     private fun collapse(){
@@ -239,6 +267,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
     override fun onTimerTick(duration: String) {
         binding.tvTimer.text = duration
+        this.duration = duration.dropLast(3)
         binding.waveformView1.addAmplitude(recorder.maxAmplitude.toFloat())
     }
 }
