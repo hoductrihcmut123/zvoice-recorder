@@ -53,6 +53,7 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
 
         val success = db.insert(TBL_AUDIO_RECORDS, null, contentValues)
         db.close()
+
         return success
     }
 

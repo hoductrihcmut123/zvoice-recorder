@@ -2,10 +2,10 @@ package com.example.myapplication1
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.os.*
-import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -85,8 +85,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         }
 
         binding.btnList.setOnClickListener {
-            //TODO
-            Toast.makeText(this, "List button", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, GalleryActivity::class.java))
         }
 
         binding.btnDone.setOnClickListener {
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         }
 
         var filePath = "$dirPath$newFilename.mp3"
-        var timestamp = Date().time.toInt()
+        var timestamp = (Date().time/1000).toInt()
         var ampsPath = "$dirPath$newFilename"
 
         try {
@@ -143,7 +142,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             out.close()
         }catch (e: IOException){}
 
-        val ar = AudioRecordModel(filename = filename, filePath = filePath, timestamp = timestamp, duration = duration, ampsPath = ampsPath)
+        val ar = AudioRecordModel(filename = newFilename, filePath = filePath, timestamp = timestamp, duration = duration, ampsPath = ampsPath)
         GlobalScope.launch{
             val status = sqLiteHelper.insertAudioRecord(ar)
             if(status > -1){
@@ -159,7 +158,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         hideKeyboard(binding.bottomSheet.filenameInput)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },50)
+        },250)
     }
 
     private fun hideKeyboard(view: View) {
@@ -207,7 +206,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             MediaRecorder(this)
         }
         dirPath = "${externalCacheDir?.absolutePath}"
-        val simpleDateFormat = SimpleDateFormat("yyyy.MM.DD_hh.mm.ss")
+        val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss")
         val date = simpleDateFormat.format(Date())
         filename = "audio_record_$date"
 
