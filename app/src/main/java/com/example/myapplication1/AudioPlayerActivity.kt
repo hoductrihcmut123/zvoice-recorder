@@ -8,11 +8,22 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ImageButton
 import android.widget.SeekBar
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
+import java.text.DecimalFormat
+import java.text.NumberFormat
 
 class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var mediaPlayer: MediaPlayer
+
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var tvFilename: TextView
+
+    private lateinit var tvTrackProgress: TextView
+    private lateinit var tvTrackDuration: TextView
+
 
     private lateinit var btnPlay: ImageButton
     private lateinit var btnForward: ImageButton
@@ -39,6 +50,21 @@ class AudioPlayerActivity : AppCompatActivity() {
             prepare()
         }
 
+        tvTrackProgress = findViewById(R.id.tvTrackProgress)
+        tvTrackDuration= findViewById(R.id.tvTrackDuration)
+        tvTrackDuration.text = dateFormat(mediaPlayer.duration)
+
+        toolbar = findViewById(R.id.toolbar)
+        tvFilename = findViewById(R.id.tvFilename)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        toolbar.setNavigationOnClickListener{
+            onBackPressed()
+        }
+        tvFilename.text = filename
+
+
         btnPlay = findViewById(R.id.btnPlay)
         btnForward = findViewById(R.id.btnForward)
         btnBackward = findViewById(R.id.btnBackward)
@@ -48,6 +74,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         handler = Handler(Looper.getMainLooper())
         runnable = Runnable{
             seekBar.progress = mediaPlayer.currentPosition
+            tvTrackProgress.text = dateFormat(mediaPlayer.currentPosition)
             handler.postDelayed(runnable, delay)
         }
 
@@ -56,7 +83,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener {
             btnPlay.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play_circle, theme)
             handler.removeCallbacks(runnable, delay)
-
         }
 
         btnPlay.setOnClickListener{
@@ -108,7 +134,28 @@ class AudioPlayerActivity : AppCompatActivity() {
         }else {
             mediaPlayer.pause()
             btnPlay.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play_circle, theme)
-            handler.removeCallbacks(runnable, delay)
+            handler.removeCallbacks(runnable)
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        mediaPlayer.stop()
+        mediaPlayer.release()
+        handler.removeCallbacks(runnable)
+    }
+
+    private fun dateFormat(duration: Int): String{
+        var d = duration / 1000
+        var s = d % 60
+        var m = d/60 % 60
+        var h = (d - m*60)/ 3600
+
+        val f : NumberFormat = DecimalFormat("00")
+        var str = "$m:${f.format(s)}"
+
+        if(h>0)
+            str = "$h:$str"
+        return str
     }
 }
