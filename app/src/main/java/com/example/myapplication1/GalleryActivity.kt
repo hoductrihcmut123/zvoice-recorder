@@ -1,5 +1,6 @@
 package com.example.myapplication1
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -50,10 +51,15 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onItemClickListener(position: Int) {
-        Toast.makeText(this, "Short Click", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "$position", Toast.LENGTH_SHORT).show()
+        var audioRecord = records[position]
+        var intent = Intent(this, AudioPlayerActivity::class.java)
+        intent.putExtra("filePath", audioRecord.filePath)
+        intent.putExtra("filename", audioRecord.filename)
+        startActivity(intent)
     }
 
     override fun onItemLongClickListener(position: Int) {
-        Toast.makeText(this, "Long Click", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Long Click", Toast.LENGTH_SHORT).show()
     }
 }
