@@ -10,13 +10,35 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Adapter(private var records : ArrayList<AudioRecordModel>) : RecyclerView.Adapter<Adapter.ViewHolder>(){
+class Adapter(private var records : ArrayList<AudioRecordModel>, var listener: OnItemClickListener) : RecyclerView.Adapter<Adapter.ViewHolder>(){
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener{
         var tvFilename : TextView = itemView.findViewById(R.id.tvFilename)
         var tvDuration : TextView = itemView.findViewById(R.id.tvDuration)
         var tvTimestamp : TextView = itemView.findViewById(R.id.tvTimestamp)
         var checkbox : CheckBox = itemView.findViewById(R.id.checkbox)
+
+        init {
+            itemView.setOnClickListener(this)
+            itemView.setOnLongClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION)
+            {
+                listener.onItemClickListener(position)
+            }
+        }
+
+        override fun onLongClick(v: View?): Boolean {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION)
+            {
+                listener.onItemLongClickListener(position)
+            }
+            return true
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

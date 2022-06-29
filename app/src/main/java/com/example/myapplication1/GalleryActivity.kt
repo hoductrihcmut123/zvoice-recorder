@@ -2,12 +2,13 @@ package com.example.myapplication1
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class GalleryActivity : AppCompatActivity() {
+class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var records : ArrayList<AudioRecordModel>
     private lateinit var myAdapter : Adapter
@@ -20,7 +21,7 @@ class GalleryActivity : AppCompatActivity() {
 
         records = ArrayList()
         db = SQLiteHelper(this)
-        myAdapter = Adapter(records)
+        myAdapter = Adapter(records, this)
         initView()
         recyclerview.apply {
             adapter = myAdapter
@@ -46,5 +47,13 @@ class GalleryActivity : AppCompatActivity() {
 
             myAdapter.notifyDataSetChanged()
         }
+    }
+
+    override fun onItemClickListener(position: Int) {
+        Toast.makeText(this, "Short Click", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onItemLongClickListener(position: Int) {
+        Toast.makeText(this, "Long Click", Toast.LENGTH_SHORT).show()
     }
 }
