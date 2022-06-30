@@ -33,7 +33,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private lateinit var runnable: Runnable
     private lateinit var handler: Handler
-    private var delay = 100L
+    private var delay = 50L
     private var jumpValue = 1000
     private var playbackSpeed = 1f
 

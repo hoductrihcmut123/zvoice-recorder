@@ -17,11 +17,10 @@ import androidx.core.app.ActivityCompat
 import com.example.myapplication1.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlinx.coroutines.launch
 
 const val REQUEST_CODE = 300
 
@@ -120,6 +119,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         }
 
         binding.btnDelete.isClickable = false
+
     }
 
     private fun save(){
