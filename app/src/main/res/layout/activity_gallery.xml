@@ -16,12 +16,14 @@
         android:outlineSpotShadowColor="@android:color/transparent">
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="110dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
             <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/galleryToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
-                app:title="Recordings"/>
+                app:title="Recordings"
+                app:layout_collapseMode="pin"/>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -31,7 +33,10 @@
             app:boxBackgroundColor="@color/gray"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp"
-            android:layout_margin="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             app:boxCornerRadiusBottomEnd="36dp"
             app:boxCornerRadiusBottomStart="36dp"
             app:boxCornerRadiusTopEnd="36dp"
@@ -45,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Search audio record"
                 android:inputType="text"
+                android:textSize="15sp"
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/grayDark"
                 android:imeOptions="actionSearch" />
@@ -56,5 +62,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <View
+        android:id="@+id/bottomSheetGalleryBG"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/opaqueBG"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/bottomSheetGallery"
+        layout="@layout/bottom_sheet_gallery"/>
+
+    <View
+        android:id="@+id/bottomSheetDeleteBG"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/opaqueBG"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/bottomSheetDelete"
+        layout="@layout/bottom_sheet_delete"/>
+
+    <View
+        android:id="@+id/bottomSheetRenameBG"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/opaqueBG"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/bottomSheetRename"
+        layout="@layout/bottom_sheet_rename" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         dirPath = "${externalCacheDir?.absolutePath}"
         val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss")
         val date = simpleDateFormat.format(Date())
-        filename = "audio_record_$date"
+        filename = "audioRecord_$date"
 
         recorder.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bottomSheet"
+    android:id="@+id/bottomSheetRename"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,8 +11,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Record ?"
-        android:textSize="24sp"
+        android:text="Rename"
+        android:textSize="22sp"
         android:layout_marginTop="20dp"
         android:textAlignment="center"/>
 
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/filenameInput"
+            android:id="@+id/filenameInputRename"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -35,7 +35,7 @@
         android:gravity="center"
         android:layout_marginBottom="20dp">
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancel"
+            android:id="@+id/btnCancelRename"
             android:layout_width="120dp"
             android:layout_height="55dp"
             android:text="cancel"
@@ -45,7 +45,7 @@
             app:rippleColor="@color/grayDark"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOk"
+            android:id="@+id/btnOkRename"
             android:layout_width="120dp"
             android:layout_height="55dp"
             android:layout_marginStart="30dp"
