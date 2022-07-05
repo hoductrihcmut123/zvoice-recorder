@@ -16,8 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.myapplication1.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,8 +27,9 @@ import java.util.*
 const val REQUEST_CODE = 300
 
 class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
-    private var permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
-    private var permissionGranted = false
+    private var permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private var permissionGrantedAudio = false
+    private var permissionGrantedWrite = false
 
     private lateinit var amplitudes: ArrayList<Float>
 
@@ -53,15 +56,20 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        permissionGranted = ActivityCompat.checkSelfPermission(
+        permissionGrantedAudio = ActivityCompat.checkSelfPermission(
             this,
             permissions[0]
+        ) == PackageManager.PERMISSION_GRANTED
+
+        permissionGrantedWrite = ActivityCompat.checkSelfPermission(
+            this,
+            permissions[1]
         ) == PackageManager.PERMISSION_GRANTED
 
         timer = Timer(this)
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-        if (!permissionGranted) {
+        if (!(permissionGrantedAudio and permissionGrantedWrite)) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
         }
 
@@ -70,6 +78,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.peekHeight = 0
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.isDraggable = false
 
         sqLiteHelper = SQLiteHelper(this)
 
@@ -103,8 +112,12 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         }
 
         binding.bottomSheet.btnOk.setOnClickListener {
-            collapse()
-            save()
+            GlobalScope.launch(Dispatchers.IO) {
+                save()
+                withContext(Dispatchers.Main) {
+                    collapse()
+                }
+            }
         }
 
         binding.bottomSheetBG.setOnClickListener {
@@ -158,7 +171,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         hideKeyboard(binding.bottomSheet.filenameInput)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },250)
+        },150)
     }
 
     private fun hideKeyboard(view: View) {
@@ -173,8 +186,10 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == REQUEST_CODE)
-            permissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
+        if (requestCode == REQUEST_CODE) {
+            permissionGrantedAudio = grantResults[0] == PackageManager.PERMISSION_GRANTED
+            permissionGrantedWrite = grantResults[1] == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun pauseRecording() {
@@ -194,7 +209,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     }
 
     private fun startRecording() {
-        if (!permissionGranted) {
+        if (!(permissionGrantedAudio and permissionGrantedWrite)) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
             return
         }
@@ -205,7 +220,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         } else {
             MediaRecorder(this)
         }
-        dirPath = "${externalCacheDir?.absolutePath}"
+        dirPath = "${getExternalFilesDir(null)?.absolutePath}/"
         val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss")
         val date = simpleDateFormat.format(Date())
         filename = "audioRecord_$date"

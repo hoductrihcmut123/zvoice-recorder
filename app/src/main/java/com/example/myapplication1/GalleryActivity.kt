@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -16,16 +17,22 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication1.databinding.ActivityGalleryBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var binding: ActivityGalleryBinding
 
     private lateinit var records : ArrayList<AudioRecordModel>
+    private lateinit var recordsTemp : ArrayList<AudioRecordModel>
     private lateinit var myAdapter : Adapter
     private lateinit var db : SQLiteHelper
+    private var ar: AudioRecordModel? = null
+    private lateinit var sqLiteHelper: SQLiteHelper
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var bottomSheetDeleteBehavior: BottomSheetBehavior<LinearLayout>
@@ -48,6 +55,8 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
         fetchAll()
 
+        sqLiteHelper = SQLiteHelper(this)
+
         binding.searchInput.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -62,10 +71,12 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
                     }
                     myAdapter = Adapter(filteredRecords, this@GalleryActivity)
                     binding.recyclerview.adapter = myAdapter
+                    recordsTemp = filteredRecords
                 }
                 else{
                     myAdapter = Adapter(records, this@GalleryActivity)
                     binding.recyclerview.adapter = myAdapter
+                    recordsTemp = records
                 }
             }
 
@@ -83,16 +94,19 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetGallery)
         bottomSheetBehavior.peekHeight = 0
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.isDraggable = false
 
         var bottomSheetDelete = findViewById<LinearLayout>(R.id.bottomSheetDelete)
         bottomSheetDeleteBehavior = BottomSheetBehavior.from(bottomSheetDelete)
         bottomSheetDeleteBehavior.peekHeight = 0
         bottomSheetDeleteBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetDeleteBehavior.isDraggable = false
 
         var bottomSheetRename = findViewById<LinearLayout>(R.id.bottomSheetRename)
         bottomSheetRenameBehavior = BottomSheetBehavior.from(bottomSheetRename)
         bottomSheetRenameBehavior.peekHeight = 0
         bottomSheetRenameBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetRenameBehavior.isDraggable = false
 
         binding.bottomSheetGalleryBG.setOnClickListener{
             collapseFirst()
@@ -113,8 +127,16 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         }
 
         binding.bottomSheetDelete.btnOkDelete.setOnClickListener{
-            collapseSecond()
-            Toast.makeText(this, "Deleted successfully", Toast.LENGTH_SHORT).show()
+
+            GlobalScope.launch(Dispatchers.IO) {
+                ar?.let { it1 -> deleteRecord(it1.id) }
+                withContext(Dispatchers.Main) {
+                    fetchAll()
+                    collapseSecond()
+                    binding.searchInput.text?.clear()
+                    Toast.makeText(this@GalleryActivity, "Deleted successfully", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         binding.bottomSheetGallery.btnRename.setOnClickListener{
@@ -132,15 +154,14 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         }
 
         binding.bottomSheetRename.btnOkRename.setOnClickListener{
-            collapseThird()
-            Toast.makeText(this, "Renamed successfully", Toast.LENGTH_SHORT).show()
+            renameRecord()
         }
 
 
     }
 
     private fun fetchAll(){
-        GlobalScope.launch {
+        GlobalScope.launch (Dispatchers.IO){
             records.clear()
             var queryResult = db.getAllAudioRecord()
 
@@ -148,14 +169,17 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 //                db.deleteAudioRecordById(i)
 //            }
             records.addAll(queryResult)
+            recordsTemp = records
 
-            myAdapter.notifyDataSetChanged()
+            withContext(Dispatchers.Main){
+                myAdapter.notifyDataSetChanged()
+            }
         }
     }
 
     override fun onItemClickListener(position: Int) {
         //Toast.makeText(this, "$position", Toast.LENGTH_SHORT).show()
-        var audioRecord = records[position]
+        var audioRecord = recordsTemp[position]
         var intent = Intent(this, AudioPlayerActivity::class.java)
         intent.putExtra("filePath", audioRecord.filePath)
         intent.putExtra("filename", audioRecord.filename)
@@ -164,9 +188,13 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
     override fun onItemLongClickListener(position: Int) {
         //Toast.makeText(this, "Long Click", Toast.LENGTH_SHORT).show()
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        binding.bottomSheetGalleryBG.visibility = View.VISIBLE
-        binding.bottomSheetGallery.filenameGallery.text = records[position].filename
+        hideKeyboard(binding.searchInput)
+        Handler(Looper.getMainLooper()).postDelayed({
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            binding.bottomSheetGalleryBG.visibility = View.VISIBLE
+            binding.bottomSheetGallery.filenameGallery.text = recordsTemp[position].filename
+        },250)
+        ar = recordsTemp[position]
     }
 
     private fun collapseFirst(){
@@ -188,11 +216,49 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         hideKeyboard(binding.bottomSheetRename.filenameInputRename)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetRenameBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },50)
+        },150)
     }
 
     private fun hideKeyboard(view: View) {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        hideKeyboard(binding.searchInput)
+    }
+
+    private fun renameRecord(){
+
+        val filename = binding.bottomSheetRename.filenameInputRename.text.toString()
+
+        if(ar == null) return
+
+        if(filename == ar!!.filename){
+            Toast.makeText(this, "Renamed successfully", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        GlobalScope.launch(Dispatchers.IO) {
+            val  status = sqLiteHelper.updateAudioRecord(AudioRecordModel(id =  ar!!.id, filename = filename))
+            withContext(Dispatchers.Main) {
+                collapseThird()
+                binding.searchInput.text?.clear()
+                if (status > -1) {
+                    fetchAll()
+                    Toast.makeText(this@GalleryActivity, "Renamed successfully", Toast.LENGTH_SHORT).show()
+                }
+                else
+                    Toast.makeText(this@GalleryActivity, "Renamed failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun deleteRecord(id: Int) {
+        sqLiteHelper.deleteAudioRecordById(id)
+        File("${ar?.filePath}").delete()
+        File("${ar?.ampsPath}").delete()
+    }
+
 }
