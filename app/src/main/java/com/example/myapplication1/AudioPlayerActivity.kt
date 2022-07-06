@@ -1,149 +1,87 @@
 package com.example.myapplication1
 
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.media.PlaybackParams
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
-import android.util.Log
-import android.widget.ImageButton
 import android.widget.SeekBar
-import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.chip.Chip
+import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
-class AudioPlayerActivity : AppCompatActivity() {
-    private lateinit var mediaPlayer: MediaPlayer
+class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
 
-    private lateinit var toolbar: MaterialToolbar
-    private lateinit var tvFilename: TextView
-
-    private lateinit var tvTrackProgress: TextView
-    private lateinit var tvTrackDuration: TextView
-
-
-    private lateinit var btnPlay: ImageButton
-    private lateinit var btnForward: ImageButton
-    private lateinit var btnBackward: ImageButton
-    private lateinit var btnSpeed: Chip
-    private lateinit var seekBar: SeekBar
-
-    private lateinit var runnable: Runnable
-    private lateinit var handler: Handler
-    private var delay = 50L
     private var jumpValue = 1000
     private var playbackSpeed = 1f
+    private lateinit var filePath: String
+
+
+    companion object{
+        var delay = 50L
+        var isPlaying: Boolean = false
+        lateinit var runnable: Runnable
+        lateinit var handler: Handler
+        var audioPlayerService: AudioPlayerService? = null
+        lateinit var filename: String
+        @SuppressLint("StaticFieldLeak")
+        lateinit var binding: ActivityAudioPlayerBinding
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_audio_player)
+        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        var filePath = intent.getStringExtra("filePath")
-        var filename = intent.getStringExtra("filename")
+        filePath = intent.getStringExtra("filePath").toString()
+        filename = intent.getStringExtra("filename").toString()
 
-        mediaPlayer = MediaPlayer()
-        mediaPlayer.apply {
-            setDataSource(filePath)
-            prepare()
-        }
+        // Starting Service
+        val intent = Intent(this, AudioPlayerService::class.java)
+        bindService(intent,this, BIND_AUTO_CREATE)
+        startService(intent)
 
-        tvTrackProgress = findViewById(R.id.tvTrackProgress)
-        tvTrackDuration= findViewById(R.id.tvTrackDuration)
-        tvTrackDuration.text = dateFormat(mediaPlayer.duration)
-
-        toolbar = findViewById(R.id.toolbar)
-        tvFilename = findViewById(R.id.tvFilename)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        toolbar.setNavigationOnClickListener{
+        binding.toolbar.setNavigationOnClickListener{
             onBackPressed()
         }
-        tvFilename.text = filename
-
-
-        btnPlay = findViewById(R.id.btnPlay)
-        btnForward = findViewById(R.id.btnForward)
-        btnBackward = findViewById(R.id.btnBackward)
-        btnSpeed = findViewById(R.id.chip)
-        seekBar = findViewById(R.id.seekBar)
-
-        handler = Handler(Looper.getMainLooper())
-        runnable = Runnable{
-            seekBar.progress = mediaPlayer.currentPosition
-            tvTrackProgress.text = dateFormat(mediaPlayer.currentPosition)
-            handler.postDelayed(runnable, delay)
-        }
-
-        playPausePlayer()
-        seekBar.max = mediaPlayer.duration
-        mediaPlayer.setOnCompletionListener {
-            btnPlay.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play_circle, theme)
-            handler.removeCallbacks(runnable, delay)
-        }
-
-        btnPlay.setOnClickListener{
-            playPausePlayer()
-        }
-
-        btnForward.setOnClickListener{
-            mediaPlayer.seekTo(mediaPlayer.currentPosition + jumpValue)
-            seekBar.progress += jumpValue
-        }
-
-        btnBackward.setOnClickListener{
-            mediaPlayer.seekTo(mediaPlayer.currentPosition - jumpValue)
-            seekBar.progress -= jumpValue
-        }
-
-        btnSpeed.setOnClickListener{
-            if (playbackSpeed != 2f)
-                playbackSpeed += 0.5f
-            else
-                playbackSpeed = 0.5f
-
-            mediaPlayer.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
-            btnSpeed.text = "x $playbackSpeed"
-        }
-
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser)
-                    mediaPlayer.seekTo(progress)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
-        })
+        binding.tvFilename.text = filename
 
     }
 
     private fun playPausePlayer(){
-        if(!mediaPlayer.isPlaying)
+        isPlaying = audioPlayerService!!.mediaPlayer!!.isPlaying
+        if(!isPlaying)
         {
-            mediaPlayer.start()
-            btnPlay.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_pause_circle, theme)
+            isPlaying = true
+            audioPlayerService!!.mediaPlayer!!.start()
+            binding.btnPlay.setImageResource(R.drawable.ic_pause_circle)
+            audioPlayerService!!.showNotification(R.drawable.ic_pausebig)
             handler.postDelayed(runnable, delay)
         }else {
-            mediaPlayer.pause()
-            btnPlay.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play_circle, theme)
+            isPlaying = false
+            audioPlayerService!!.mediaPlayer!!.pause()
+            binding.btnPlay.setImageResource(R.drawable.ic_play_circle)
+            audioPlayerService!!.showNotification(R.drawable.ic_playbig)
             handler.removeCallbacks(runnable)
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        mediaPlayer.stop()
-        mediaPlayer.release()
+        audioPlayerService!!.mediaPlayer!!.stop()
+        audioPlayerService!!.mediaPlayer!!.release()
         handler.removeCallbacks(runnable)
+        audioPlayerService!!.stopForeground(true)
+        audioPlayerService = null
     }
 
     private fun dateFormat(duration: Int): String{
@@ -158,5 +96,82 @@ class AudioPlayerActivity : AppCompatActivity() {
         if(h>0)
             str = "$h:$str"
         return str
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        val binder = service as AudioPlayerService.MyBinder
+        audioPlayerService = binder.currentService()
+
+        // Create MediaPlayer
+        audioPlayerService!!.mediaPlayer = MediaPlayer()
+        audioPlayerService!!.mediaPlayer?.apply {
+            setDataSource(filePath)
+            prepare()
+        }
+
+        binding.tvTrackDuration.text = dateFormat(audioPlayerService!!.mediaPlayer!!.duration)
+
+        handler = Handler(Looper.getMainLooper())
+        runnable = Runnable{
+            binding.seekBar.progress = audioPlayerService!!.mediaPlayer!!.currentPosition
+            binding.tvTrackProgress.text = dateFormat(audioPlayerService!!.mediaPlayer!!.currentPosition)
+            handler.postDelayed(runnable, delay)
+        }
+
+
+        playPausePlayer()
+
+        binding.seekBar.max = audioPlayerService!!.mediaPlayer!!.duration
+
+        audioPlayerService!!.mediaPlayer!!.setOnCompletionListener {
+            binding.btnPlay.setImageResource(R.drawable.ic_play_circle)
+            audioPlayerService!!.showNotification(R.drawable.ic_playbig)
+            handler.removeCallbacks(runnable, delay)
+        }
+
+        binding.btnPlay.setOnClickListener{
+            playPausePlayer()
+        }
+
+        binding.btnForward.setOnClickListener{
+            audioPlayerService!!.mediaPlayer!!.seekTo(audioPlayerService!!.mediaPlayer!!.currentPosition + jumpValue)
+            binding.seekBar.progress += jumpValue
+        }
+
+        binding.btnBackward.setOnClickListener{
+            audioPlayerService!!.mediaPlayer!!.seekTo(audioPlayerService!!.mediaPlayer!!.currentPosition - jumpValue)
+            binding.seekBar.progress -= jumpValue
+        }
+
+        binding.chip.setOnClickListener{
+            if (playbackSpeed != 2f)
+                playbackSpeed += 0.5f
+            else
+                playbackSpeed = 0.5f
+
+            audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
+            binding.chip.text = "x $playbackSpeed"
+        }
+
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser)
+                    audioPlayerService!!.mediaPlayer!!.seekTo(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+
+
+        audioPlayerService!!.showNotification(R.drawable.ic_pausebig)
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        audioPlayerService = null
     }
 }

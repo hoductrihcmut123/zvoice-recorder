@@ -87,7 +87,8 @@
             android:id="@+id/btnPlay"
             android:layout_width="66dp"
             android:layout_height="66dp"
-            android:background="@drawable/ic_play_circle"
+            android:background="@drawable/ic_play_pause"
+            android:src="@drawable/ic_pause_circle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
