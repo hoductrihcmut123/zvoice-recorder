@@ -1,7 +1,6 @@
 package com.example.myapplication1
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.*
 import android.media.MediaPlayer
 import android.media.PlaybackParams
@@ -14,8 +13,6 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
-import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlinx.coroutines.test.withTestContext
 import java.text.DecimalFormat
 import java.text.NumberFormat
 

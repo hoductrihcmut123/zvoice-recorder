@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import kotlin.system.exitProcess
 
 class AudioPlayerNotificationReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -33,20 +32,11 @@ class AudioPlayerNotificationReceiver: BroadcastReceiver() {
 
     private fun exit(context: Context?){
 
-//        AudioPlayerActivity.audioPlayerService!!.mediaPlayer!!.stop()
-//        AudioPlayerActivity.audioPlayerService!!.mediaPlayer!!.release()
-//        AudioPlayerActivity.handler.removeCallbacks(AudioPlayerActivity.runnable)
-//        AudioPlayerActivity.audioPlayerService!!.stopForeground(true)
-//        AudioPlayerActivity.audioPlayerService = null
-//        AudioPlayerActivity.audioPlayerService!!.stopService(AudioPlayerActivity.intent)
-
         val local = Intent()
         local.action = "exit ${AudioPlayerActivity.filename}.action"
         if (context != null) {
             Log.e("test", "check sendBroadCast ${AudioPlayerActivity.filename}")
             LocalBroadcastManager.getInstance(context).sendBroadcast(local)
         }
-
-//        exitProcess(1)
     }
 }

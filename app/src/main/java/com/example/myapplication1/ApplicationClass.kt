@@ -1,10 +1,8 @@
 package com.example.myapplication1
 
 import android.app.Application
-import android.app.ApplicationExitInfo
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.media.MediaDrm
 import android.os.Build
 
 class ApplicationClass: Application() {
