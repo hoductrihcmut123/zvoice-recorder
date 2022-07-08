@@ -1,27 +1,30 @@
 package com.example.myapplication1
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
+import android.app.Activity
+import android.content.*
 import android.media.MediaPlayer
 import android.media.PlaybackParams
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.test.withTestContext
 import java.text.DecimalFormat
 import java.text.NumberFormat
+
 
 class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
 
     private var jumpValue = 1000
     private var playbackSpeed = 1f
     private lateinit var filePath: String
-
 
     companion object{
         var delay = 50L
@@ -32,6 +35,14 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         lateinit var filename: String
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityAudioPlayerBinding
+        lateinit var intent: Intent
+    }
+
+    private var receiver = object : BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.e("test", "received")
+            onBackPressed()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +53,10 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         filePath = intent.getStringExtra("filePath").toString()
         filename = intent.getStringExtra("filename").toString()
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("exit $filename.action"))
+
         // Starting Service
-        val intent = Intent(this, AudioPlayerService::class.java)
+        intent = Intent(this, AudioPlayerService::class.java)
         bindService(intent,this, BIND_AUTO_CREATE)
         startService(intent)
 
@@ -54,7 +67,6 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
             onBackPressed()
         }
         binding.tvFilename.text = filename
-
     }
 
     private fun playPausePlayer(){
@@ -82,6 +94,8 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         handler.removeCallbacks(runnable)
         audioPlayerService!!.stopForeground(true)
         audioPlayerService = null
+        intent = Intent(this, AudioPlayerService::class.java)
+        stopService(intent)
     }
 
     private fun dateFormat(duration: Int): String{
@@ -174,4 +188,10 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceDisconnected(name: ComponentName?) {
         audioPlayerService = null
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+    }
+
 }
