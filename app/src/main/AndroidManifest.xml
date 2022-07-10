@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication1">
 
+    <uses-permission android:name="android.permission.BROADCAST_CLOSE_SYSTEM_DIALOGS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -40,6 +42,7 @@
             </intent-filter>
         </activity>
         <service android:name=".AudioPlayerService"/>
+        <service android:name=".RecordingService"/>
         <receiver android:name=".AudioPlayerNotificationReceiver"
             android:enabled="true"/>
     </application>

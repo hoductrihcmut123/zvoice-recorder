@@ -39,13 +39,14 @@ class AudioPlayerService : Service() {
             .setContentText(AudioPlayerActivity.filename)
             .setSmallIcon(R.drawable.ic_audiotrack)
             .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.ic_largeiconservice))
-            .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken))
+            .setStyle(androidx.media.app.NotificationCompat.MediaStyle())
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSilent(true)
             .addAction(btnPlayPause, "Play", playPendingIntent)
             .addAction(R.drawable.ic_deletebig, "Exit", exitPendingIntent)
             .build()
+
 
         startForeground(13, notification)
     }

@@ -45,7 +45,7 @@ class WaveformView(context: Context?, attrs: AttributeSet?) : View(context, attr
     }
 
     fun clear() : ArrayList<Float>{
-        var amps = amplitudes.clone() as ArrayList<Float>
+        val amps = amplitudes.clone() as ArrayList<Float>
         amplitudes.clear()
         spikes.clear()
         invalidate()

@@ -32,6 +32,10 @@ class AudioPlayerNotificationReceiver: BroadcastReceiver() {
 
     private fun exit(context: Context?){
 
+        // Close status bar
+        val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+        context!!.sendBroadcast(it)
+
         val local = Intent()
         local.action = "exit ${AudioPlayerActivity.filename}.action"
         if (context != null) {

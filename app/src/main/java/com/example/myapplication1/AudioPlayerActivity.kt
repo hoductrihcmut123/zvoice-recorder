@@ -19,7 +19,7 @@ import java.text.NumberFormat
 
 class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
 
-    private var jumpValue = 1000
+    private var jumpValue = 5000
     private var playbackSpeed = 1f
     private lateinit var filePath: String
 
@@ -96,16 +96,17 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun dateFormat(duration: Int): String{
-        var d = duration / 1000
-        var s = d % 60
-        var m = d/60 % 60
-        var h = (d - m*60)/ 3600
+        val d = duration / 1000
+        val s = d % 60
+        val m = d/60 % 60
+        val h = (d - m*60)/ 3600
 
         val f : NumberFormat = DecimalFormat("00")
         var str = "$m:${f.format(s)}"
 
-        if(h>0)
+        if(h>0) {
             str = "$h:$str"
+        }
         return str
     }
 
@@ -155,10 +156,12 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         }
 
         binding.chip.setOnClickListener{
-            if (playbackSpeed != 2f)
+            if (playbackSpeed != 2f) {
                 playbackSpeed += 0.5f
-            else
+            }
+            else {
                 playbackSpeed = 0.5f
+            }
 
             audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
             binding.chip.text = "x $playbackSpeed"
@@ -166,8 +169,9 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser)
+                if (fromUser) {
                     audioPlayerService!!.mediaPlayer!!.seekTo(progress)
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {

@@ -1,17 +1,17 @@
 package com.example.myapplication1
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.os.*
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.myapplication1.databinding.ActivityMainBinding
@@ -21,36 +21,42 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 const val REQUEST_CODE = 300
 
 class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
-    private var permissions = arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    private var permissionGrantedAudio = false
-    private var permissionGrantedWrite = false
 
-    private lateinit var amplitudes: ArrayList<Float>
+    companion object {
+        private var permissions =
+            arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        private var permissionGrantedAudio = false
+        private var permissionGrantedWrite = false
 
-    private lateinit var binding: ActivityMainBinding
+        private lateinit var amplitudes: ArrayList<Float>
 
-    private lateinit var recorder: MediaRecorder
-    private var dirPath = ""
-    private var filename = ""
-    private var isRecording = false
-    private var isPaused = false
+        lateinit var binding: ActivityMainBinding
+
+        var dirPath = ""
+        var filename = ""
+        var isRecording = false
+        var isPaused = false
+
+        lateinit var timer: Timer
+
+        private lateinit var vibrator: Vibrator
+
+        private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
+        private lateinit var sqLiteHelper: SQLiteHelper
+
+        var recordingService: RecordingService? = null
+        lateinit var intent: Intent
+    }
+
     private var duration = ""
 
-    private lateinit var timer: Timer
 
-    private lateinit var vibrator: Vibrator
-
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-
-    private lateinit var sqLiteHelper: SQLiteHelper
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -73,7 +79,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
         }
 
-        var bottomSheet = findViewById<LinearLayout>(R.id.bottomSheet)
+        val bottomSheet = findViewById<LinearLayout>(R.id.bottomSheet)
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.peekHeight = 0
@@ -89,46 +95,18 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
                 else -> startRecording()
             }
 
-            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            if(Build.VERSION.SDK_INT >= 26) {
+                vibrator.vibrate(
+                    VibrationEffect.createOneShot(
+                        50,
+                        VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+                )
+            }
         }
 
         binding.btnList.setOnClickListener {
             startActivity(Intent(this, GalleryActivity::class.java))
-        }
-
-        binding.btnDone.setOnClickListener {
-            stopRecording()
-            Toast.makeText(this, "Record saved", Toast.LENGTH_SHORT).show()
-
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            binding.bottomSheetBG.visibility = View.VISIBLE
-
-            binding.bottomSheet.filenameInput.setText(filename)
-        }
-
-        binding.bottomSheet.btnCancel.setOnClickListener {
-            File("$dirPath$filename.mp3").delete()
-            collapse()
-        }
-
-        binding.bottomSheet.btnOk.setOnClickListener {
-            GlobalScope.launch(Dispatchers.IO) {
-                save()
-                withContext(Dispatchers.Main) {
-                    collapse()
-                }
-            }
-        }
-
-        binding.bottomSheetBG.setOnClickListener {
-            File("$dirPath$filename.mp3").delete()
-            collapse()
-        }
-
-        binding.btnDelete.setOnClickListener {
-            stopRecording()
-            File("$dirPath$filename.mp3").delete()
-            Toast.makeText(this, "Record deleted", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnDelete.isClickable = false
@@ -139,17 +117,17 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         val newFilename = binding.bottomSheet.filenameInput.text.toString()
         if(newFilename != filename)
         {
-            var newFile = File("$dirPath$newFilename.mp3")
+            val newFile = File("$dirPath$newFilename.mp3")
             File("$dirPath$filename.mp3").renameTo(newFile)     // put contents of old file to newFile and remove old file
         }
 
-        var filePath = "$dirPath$newFilename.mp3"
-        var timestamp = (Date().time/1000).toInt()
-        var ampsPath = "$dirPath$newFilename"
+        val filePath = "$dirPath$newFilename.mp3"
+        val timestamp = (Date().time/1000).toInt()
+        val ampsPath = "$dirPath$newFilename"
 
         try {
-            var fos = FileOutputStream(ampsPath)
-            var out = ObjectOutputStream(fos)
+            val fos = FileOutputStream(ampsPath)
+            val out = ObjectOutputStream(fos)
             out.writeObject(amplitudes)
             fos.close()
             out.close()
@@ -160,8 +138,10 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             val status = sqLiteHelper.insertAudioRecord(ar)
             if(status > -1){
                 Log.e("test", "Audio Record added")
+                //Toast.makeText(this@MainActivity, "Record saved", Toast.LENGTH_SHORT).show()
             } else {
                 Log.e("test", "Audio Record not saved")
+                //Toast.makeText(this@MainActivity, "Record save failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -171,7 +151,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         hideKeyboard(binding.bottomSheet.filenameInput)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },150)
+        },200)
     }
 
     private fun hideKeyboard(view: View) {
@@ -193,19 +173,28 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     }
 
     private fun pauseRecording() {
-        recorder.pause()
-        isPaused = true
-        binding.btnRecord.setImageResource(R.drawable.ic_mic)
 
+        binding.btnRecord.setImageResource(R.drawable.ic_mic)
         timer.pause()
+
+        GlobalScope.launch(Dispatchers.Default) {
+            isPaused = true
+            recordingService!!.recorder.pause()
+            recordingService!!.showNotification("Recording stopped")
+        }
+
     }
 
     private fun resumeRecording() {
-        recorder.resume()
-        isPaused = false
-        binding.btnRecord.setImageResource(R.drawable.ic_pause)
 
+        binding.btnRecord.setImageResource(R.drawable.ic_pause)
         timer.start()
+
+        GlobalScope.launch(Dispatchers.Default) {
+            isPaused = false
+            recordingService!!.recorder.resume()
+            recordingService!!.showNotification("Recording in progress")
+        }
     }
 
     private fun startRecording() {
@@ -213,50 +202,19 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
             return
         }
-        // start recording here
+        // start recordingService here
 
-        recorder = if (Build.VERSION.SDK_INT < 31) {
-            MediaRecorder()
-        } else {
-            MediaRecorder(this)
-        }
-        dirPath = "${getExternalFilesDir(null)?.absolutePath}/"
-        val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss")
-        val date = simpleDateFormat.format(Date())
-        filename = "audioRecord_$date"
+        intent = Intent(this, RecordingService::class.java)
+        bindService(intent,connection, BIND_AUTO_CREATE)
+        startService(intent)
 
-        recorder.apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile("$dirPath$filename.mp3")
-
-            try {
-                prepare()
-            } catch (e: IOException) {
-            }
-
-            start()
-        }
-        binding.btnRecord.setImageResource(R.drawable.ic_pause)
-        isRecording = true
-        isPaused = false
-
-        binding.waveformView2.start()
-
-        timer.start()
-
-        binding.btnDelete.isClickable = true
-        binding.btnDelete.setImageResource(R.drawable.ic_delete)
-
-        binding.btnDone.visibility = View.VISIBLE
-        binding.btnList.visibility = View.GONE
+        // The recording action is implement in onStartCommand() in RecordingService
     }
 
     private fun stopRecording() {
         timer.stop()
 
-        recorder.apply {
+        recordingService!!.recorder.apply {
             stop()
             release()
         }
@@ -282,6 +240,65 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     override fun onTimerTick(duration: String) {
         binding.tvTimer.text = duration
         this.duration = duration.dropLast(3)
-        binding.waveformView1.addAmplitude(recorder.maxAmplitude.toFloat())
+        binding.waveformView1.addAmplitude(recordingService!!.recorder.maxAmplitude.toFloat())
     }
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as RecordingService.MyBinder
+            recordingService = binder.currentService()
+
+            binding.btnDone.setOnClickListener {
+                stopRecording()
+
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                binding.bottomSheetBG.visibility = View.VISIBLE
+
+                binding.bottomSheet.filenameInput.setText(filename)
+            }
+
+            binding.bottomSheet.btnCancel.setOnClickListener {
+                File("$dirPath$filename.mp3").delete()
+                collapse()
+                stopService()
+            }
+
+            binding.bottomSheet.btnOk.setOnClickListener {
+                GlobalScope.launch(Dispatchers.IO) {
+                    save()
+                    stopService()
+                    withContext(Dispatchers.Main) {
+                        collapse()
+                    }
+                }
+            }
+
+            binding.bottomSheetBG.setOnClickListener {
+                File("$dirPath$filename.mp3").delete()
+                collapse()
+                stopService()
+            }
+
+            binding.btnDelete.setOnClickListener {
+                stopRecording()
+                File("$dirPath$filename.mp3").delete()
+                stopService()
+                Toast.makeText(this@MainActivity, "Record deleted", Toast.LENGTH_SHORT).show()
+            }
+
+            recordingService!!.showNotification("Recording in progress")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            recordingService = null
+        }
+    }
+
+    private fun stopService(){
+        recordingService!!.stopForeground(true)
+        recordingService = null
+        unbindService(connection)
+        stopService(intent)
+    }
+
 }

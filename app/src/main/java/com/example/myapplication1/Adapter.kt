@@ -48,11 +48,11 @@ class Adapter(private var records : ArrayList<AudioRecordModel>, var listener: O
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (position != RecyclerView.NO_POSITION){
-            var record = records[position]
+            val record = records[position]
 
-            var sdf = SimpleDateFormat("dd/MM/yyyy")
-            var date = Date(record.timestamp.toLong() * 1000L)
-            var strDate = sdf.format(date)
+            val sdf = SimpleDateFormat("dd/MM/yyyy")
+            val date = Date(record.timestamp.toLong() * 1000L)
+            val strDate = sdf.format(date)
 
             holder.tvFilename.text = record.filename
             holder.tvTimestamp.text = strDate

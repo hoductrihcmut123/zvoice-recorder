@@ -50,7 +50,7 @@
         android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:progress="30"
+        android:progress="0"
         android:progressTint="@color/orange"
         android:thumbTint="@color/orange"
         android:layout_marginBottom="30dp"

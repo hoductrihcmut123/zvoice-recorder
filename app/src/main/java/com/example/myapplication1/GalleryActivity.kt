@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -61,13 +60,14 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                var filteredRecords = ArrayList<AudioRecordModel>()
+                val filteredRecords = ArrayList<AudioRecordModel>()
                 if (binding.searchInput.text!!.isNotEmpty())
                 {
                     for(i in 0 until records.size)
                     {
-                        if(records[i].filename.lowercase().contains(s.toString().lowercase()))
+                        if(records[i].filename.lowercase().contains(s.toString().lowercase())) {
                             filteredRecords.add(records[i])
+                        }
                     }
                     myAdapter = Adapter(filteredRecords, this@GalleryActivity)
                     binding.recyclerview.adapter = myAdapter
@@ -90,19 +90,19 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             onBackPressed()
         }
 
-        var bottomSheetGallery = findViewById<LinearLayout>(R.id.bottomSheetGallery)
+        val bottomSheetGallery = findViewById<LinearLayout>(R.id.bottomSheetGallery)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetGallery)
         bottomSheetBehavior.peekHeight = 0
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetBehavior.isDraggable = false
 
-        var bottomSheetDelete = findViewById<LinearLayout>(R.id.bottomSheetDelete)
+        val bottomSheetDelete = findViewById<LinearLayout>(R.id.bottomSheetDelete)
         bottomSheetDeleteBehavior = BottomSheetBehavior.from(bottomSheetDelete)
         bottomSheetDeleteBehavior.peekHeight = 0
         bottomSheetDeleteBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetDeleteBehavior.isDraggable = false
 
-        var bottomSheetRename = findViewById<LinearLayout>(R.id.bottomSheetRename)
+        val bottomSheetRename = findViewById<LinearLayout>(R.id.bottomSheetRename)
         bottomSheetRenameBehavior = BottomSheetBehavior.from(bottomSheetRename)
         bottomSheetRenameBehavior.peekHeight = 0
         bottomSheetRenameBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -163,7 +163,7 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
     private fun fetchAll(){
         GlobalScope.launch (Dispatchers.IO){
             records.clear()
-            var queryResult = db.getAllAudioRecord()
+            val queryResult = db.getAllAudioRecord()
 
 //            for(i in (0..100)){
 //                db.deleteAudioRecordById(i)
@@ -179,8 +179,8 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
     override fun onItemClickListener(position: Int) {
         //Toast.makeText(this, "$position", Toast.LENGTH_SHORT).show()
-        var audioRecord = recordsTemp[position]
-        var intent = Intent(this, AudioPlayerActivity::class.java)
+        val audioRecord = recordsTemp[position]
+        val intent = Intent(this, AudioPlayerActivity::class.java)
         intent.putExtra("filePath", audioRecord.filePath)
         intent.putExtra("filename", audioRecord.filename)
         startActivity(intent)
@@ -216,7 +216,7 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         hideKeyboard(binding.bottomSheetRename.filenameInputRename)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetRenameBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },150)
+        },200)
     }
 
     private fun hideKeyboard(view: View) {
@@ -249,8 +249,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
                     fetchAll()
                     Toast.makeText(this@GalleryActivity, "Renamed successfully", Toast.LENGTH_SHORT).show()
                 }
-                else
+                else {
                     Toast.makeText(this@GalleryActivity, "Renamed failed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
