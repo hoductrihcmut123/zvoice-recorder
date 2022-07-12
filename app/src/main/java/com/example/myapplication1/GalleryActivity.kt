@@ -15,7 +15,13 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication1.databinding.ActivityGalleryBinding
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -37,6 +43,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
     private lateinit var bottomSheetDeleteBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var bottomSheetRenameBehavior: BottomSheetBehavior<LinearLayout>
 
+    private lateinit var gso : GoogleSignInOptions
+    private lateinit var gsc : GoogleSignInClient
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +64,11 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         fetchAll()
 
         sqLiteHelper = SQLiteHelper(this)
+
+        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestScopes(
+            Scope(DriveScopes.DRIVE_FILE)
+        ).build()
+        gsc = GoogleSignIn.getClient(this, gso)
 
         binding.searchInput.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -157,6 +171,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             renameRecord()
         }
 
+        binding.bottomSheetGallery.btnUpload.setOnClickListener{
+            signIn()
+        }
 
     }
 
@@ -260,6 +277,33 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         sqLiteHelper.deleteAudioRecordById(id)
         File("${ar?.filePath}").delete()
         File("${ar?.ampsPath}").delete()
+    }
+
+    private fun signIn(){
+        val signInIntent = gsc.signInIntent
+        startActivityForResult(signInIntent, 1000)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 1000){
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+
+            try {
+                task.getResult(ApiException::class.java)
+                finish()
+                navigateToUploadActivity()
+            } catch (e : ApiException) {
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun navigateToUploadActivity(){
+        val intent = Intent(this, UploadActivity::class.java)
+        intent.putExtra("filePath", ar?.filePath)
+        intent.putExtra("filename", ar?.filename)
+        startActivity(intent)
     }
 
 }
