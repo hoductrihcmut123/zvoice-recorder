@@ -3,6 +3,7 @@ package com.example.myapplication1
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
@@ -33,8 +34,10 @@ class AudioPlayerNotificationReceiver: BroadcastReceiver() {
     private fun exit(context: Context?){
 
         // Close status bar
-        val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
-        context!!.sendBroadcast(it)
+        if (Build.VERSION.SDK_INT < 31){
+            val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+            context!!.sendBroadcast(it)
+        }
 
         val local = Intent()
         local.action = "exit ${AudioPlayerActivity.filename}.action"

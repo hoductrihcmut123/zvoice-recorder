@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
@@ -29,10 +30,18 @@ class AudioPlayerService : Service() {
     fun showNotification(btnPlayPause: Int){
 
         val playIntent = Intent(baseContext, AudioPlayerNotificationReceiver::class.java).setAction(ApplicationClass.PLAY)
-        val playPendingIntent = PendingIntent.getBroadcast(baseContext, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val playPendingIntent = if (Build.VERSION.SDK_INT < 31){
+            PendingIntent.getBroadcast(baseContext, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        } else {
+            PendingIntent.getBroadcast(baseContext, 0, playIntent, PendingIntent.FLAG_MUTABLE)
+        }
 
         val exitIntent = Intent(baseContext, AudioPlayerNotificationReceiver::class.java).setAction(ApplicationClass.EXIT)
-        val exitPendingIntent = PendingIntent.getBroadcast(baseContext, 0, exitIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val exitPendingIntent = if (Build.VERSION.SDK_INT < 31){
+            PendingIntent.getBroadcast(baseContext, 0, exitIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        } else {
+            PendingIntent.getBroadcast(baseContext, 0, exitIntent, PendingIntent.FLAG_MUTABLE)
+        }
 
         val notification = NotificationCompat.Builder(baseContext, ApplicationClass.CHANNEL_ID)
             .setContentTitle("Audio record playback")
