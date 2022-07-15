@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.service
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,6 +6,9 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.myapplication1.utils.ApplicationClass
+import com.example.myapplication1.R
+import com.example.myapplication1.view.AudioPlayerActivity
 
 class AudioPlayerNotificationReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {

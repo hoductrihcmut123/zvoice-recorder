@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.database.model
 
 import java.util.*
 
@@ -7,8 +7,7 @@ data class AudioRecordModel(
     var filename: String = "",
     var filePath: String = "",
     var timestamp: Int = 0,
-    var duration: String = "",
-    var ampsPath: String = ""
+    var duration: String = ""
 ) {
     companion object{
         fun getAutoId(): Int{

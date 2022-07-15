@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.*
 import android.util.Log
 import android.view.View
@@ -14,14 +15,19 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.myapplication1.database.SQLiteHelper
+import com.example.myapplication1.database.model.AudioRecordModel
 import com.example.myapplication1.databinding.ActivityMainBinding
+import com.example.myapplication1.service.RecordingService
+import com.example.myapplication1.utils.Timer
+import com.example.myapplication1.view.GalleryActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.*
-import java.util.*
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 const val REQUEST_CODE = 300
 
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
         lateinit var binding: ActivityMainBinding
 
+        var id by Delegates.notNull<Int>()
         var dirPath = ""
         var filename = ""
         var isRecording = false
@@ -48,7 +55,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
         private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
-        private lateinit var sqLiteHelper: SQLiteHelper
+        lateinit var sqLiteHelper: SQLiteHelper
 
         var recordingService: RecordingService? = null
         lateinit var intent: Intent
@@ -87,6 +94,9 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         bottomSheetBehavior.isDraggable = false
 
         sqLiteHelper = SQLiteHelper(this)
+        GlobalScope.launch(Dispatchers.Default) {
+            updateDurationField()
+        }
 
         binding.btnRecord.setOnClickListener {
             when {
@@ -95,7 +105,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
                 else -> startRecording()
             }
 
-            if(Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= 26) {
                 vibrator.vibrate(
                     VibrationEffect.createOneShot(
                         50,
@@ -109,49 +119,94 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             startActivity(Intent(this, GalleryActivity::class.java))
         }
 
+        // button crash test
+        binding.btnCrashTest.setOnClickListener {
+            val crash = 5 / 0
+        }
+
         binding.btnDelete.isClickable = false
 
     }
 
-    private fun save(){
+    private fun deleteRecord(id: Int) {
+        sqLiteHelper.deleteAudioRecordById(id)
+        File("${dirPath}${filename}.mp3").delete()
+    }
+
+    private fun renameRecord() {
         val newFilename = binding.bottomSheet.filenameInput.text.toString()
-        if(newFilename != filename)
-        {
-            val newFile = File("$dirPath$newFilename.mp3")
-            File("$dirPath$filename.mp3").renameTo(newFile)     // put contents of old file to newFile and remove old file
-        }
 
-        val filePath = "$dirPath$newFilename.mp3"
-        val timestamp = (Date().time/1000).toInt()
-        val ampsPath = "$dirPath$newFilename"
-
-        try {
-            val fos = FileOutputStream(ampsPath)
-            val out = ObjectOutputStream(fos)
-            out.writeObject(amplitudes)
-            fos.close()
-            out.close()
-        }catch (e: IOException){}
-
-        val ar = AudioRecordModel(filename = newFilename, filePath = filePath, timestamp = timestamp, duration = duration, ampsPath = ampsPath)
-        GlobalScope.launch{
-            val status = sqLiteHelper.insertAudioRecord(ar)
-            if(status > -1){
-                Log.e("test", "Audio Record added")
-                //Toast.makeText(this@MainActivity, "Record saved", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.e("test", "Audio Record not saved")
-                //Toast.makeText(this@MainActivity, "Record save failed", Toast.LENGTH_SHORT).show()
+        GlobalScope.launch(Dispatchers.IO) {
+            val status = sqLiteHelper.updateAudioRecordNameDuration(
+                AudioRecordModel(
+                    id = id,
+                    filename = newFilename,
+                    duration = duration
+                )
+            )
+            withContext(Dispatchers.Main) {
+                collapse()
+                if (status > -1) {
+                    Log.d("renameRecord()", "Rename and update duration successfully")
+                } else {
+                    Log.d("renameRecord()", "Rename and update duration failed")
+                }
             }
         }
     }
 
-    private fun collapse(){
+    private fun updateDurationField() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val records: ArrayList<AudioRecordModel> = ArrayList()
+            val queryResult = sqLiteHelper.getAllAudioRecord()
+            records.addAll(queryResult)
+
+            withContext(Dispatchers.IO) {
+
+                for (i in (0 until records.size)) {
+
+                    if (records[i].duration == "none") {
+                        val mediaPlayer = MediaPlayer()
+                        mediaPlayer.apply {
+                            setDataSource(records[i].filePath)
+                            prepare()
+                        }
+
+                        sqLiteHelper.updateAudioRecordNameDuration(
+                            AudioRecordModel(
+                                id = records[i].id,
+                                filename = records[i].filename,
+                                duration = dateFormat(mediaPlayer.duration)
+                            )
+                        )
+                        mediaPlayer.release()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun dateFormat(duration: Int): String{
+        val d = duration / 1000
+        val s = d % 60
+        val m = d/60 % 60
+        val h = (d - m*60)/ 3600
+
+        val f : NumberFormat = DecimalFormat("00")
+        var str = "${f.format(m)}:${f.format(s)}"
+
+        if(h>0) {
+            str = "$h:$str"
+        }
+        return str
+    }
+
+    private fun collapse() {
         binding.bottomSheetBG.visibility = View.GONE
         hideKeyboard(binding.bottomSheet.filenameInput)
         Handler(Looper.getMainLooper()).postDelayed({
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        },200)
+        }, 200)
     }
 
     private fun hideKeyboard(view: View) {
@@ -174,38 +229,43 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
     private fun pauseRecording() {
 
-        binding.btnRecord.setImageResource(R.drawable.ic_mic)
-        timer.pause()
+        if (Build.VERSION.SDK_INT >= 24) {
+            binding.btnRecord.setImageResource(R.drawable.ic_mic)
+            timer.pause()
 
-        GlobalScope.launch(Dispatchers.Default) {
-            isPaused = true
-            recordingService!!.recorder.pause()
-            recordingService!!.showNotification("Recording stopped")
+            GlobalScope.launch(Dispatchers.Default) {
+                isPaused = true
+                recordingService!!.recorder.pause()
+                recordingService!!.showNotification("Recording stopped")
+            }
         }
-
     }
 
     private fun resumeRecording() {
 
-        binding.btnRecord.setImageResource(R.drawable.ic_pause)
-        timer.start()
+        if (Build.VERSION.SDK_INT >= 24) {
+            binding.btnRecord.setImageResource(R.drawable.ic_pause)
+            timer.start()
 
-        GlobalScope.launch(Dispatchers.Default) {
-            isPaused = false
-            recordingService!!.recorder.resume()
-            recordingService!!.showNotification("Recording in progress")
+            GlobalScope.launch(Dispatchers.Default) {
+                isPaused = false
+                recordingService!!.recorder.resume()
+                recordingService!!.showNotification("Recording in progress")
+            }
         }
     }
 
     private fun startRecording() {
         if (!(permissionGrantedAudio and permissionGrantedWrite)) {
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
+            Handler().postDelayed({
+                ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
+            }, 100)
             return
         }
         // start recordingService here
 
         intent = Intent(this, RecordingService::class.java)
-        bindService(intent,connection, BIND_AUTO_CREATE)
+        bindService(intent, connection, BIND_AUTO_CREATE)
         startService(intent)
 
         // The recording action is implement in onStartCommand() in RecordingService
@@ -258,14 +318,14 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             }
 
             binding.bottomSheet.btnCancel.setOnClickListener {
-                File("$dirPath$filename.mp3").delete()
+                deleteRecord(id)
                 collapse()
                 stopService()
             }
 
             binding.bottomSheet.btnOk.setOnClickListener {
                 GlobalScope.launch(Dispatchers.IO) {
-                    save()
+                    renameRecord()
                     stopService()
                     withContext(Dispatchers.Main) {
                         collapse()
@@ -274,14 +334,14 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             }
 
             binding.bottomSheetBG.setOnClickListener {
-                File("$dirPath$filename.mp3").delete()
+                deleteRecord(id)
                 collapse()
                 stopService()
             }
 
             binding.btnDelete.setOnClickListener {
                 stopRecording()
-                File("$dirPath$filename.mp3").delete()
+                deleteRecord(id)
                 stopService()
                 Toast.makeText(this@MainActivity, "Record deleted", Toast.LENGTH_SHORT).show()
             }
@@ -294,7 +354,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         }
     }
 
-    private fun stopService(){
+    private fun stopService() {
         recordingService!!.stopForeground(true)
         recordingService = null
         unbindService(connection)

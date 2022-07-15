@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.service
 
 import android.app.Service
 import android.content.Intent
@@ -7,8 +7,17 @@ import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.view.View
 import androidx.core.app.NotificationCompat
+import com.example.myapplication1.utils.ApplicationClass
+import com.example.myapplication1.MainActivity
+import com.example.myapplication1.R
+import com.example.myapplication1.database.SQLiteHelper
+import com.example.myapplication1.database.model.AudioRecordModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +31,7 @@ class RecordingService : Service() {
     }
 
     inner class MyBinder: Binder(){
-        fun currentService(): RecordingService{
+        fun currentService(): RecordingService {
             return this@RecordingService
         }
     }
@@ -41,6 +50,8 @@ class RecordingService : Service() {
         val date = simpleDateFormat.format(Date())
         MainActivity.filename = "audioRecord_$date"
 
+        MainActivity.sqLiteHelper = SQLiteHelper(this)
+
         recorder.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -54,6 +65,11 @@ class RecordingService : Service() {
 
             start()
         }
+
+        GlobalScope.launch(Dispatchers.IO) {
+            save()
+        }
+
         MainActivity.binding.btnRecord.setImageResource(R.drawable.ic_pause)
         MainActivity.isRecording = true
         MainActivity.isPaused = false
@@ -71,13 +87,30 @@ class RecordingService : Service() {
         return START_NOT_STICKY
     }
 
+     private fun save(){
+
+        val filePath = "${MainActivity.dirPath}${MainActivity.filename}.mp3"
+        val timestamp = (Date().time/1000).toInt()
+
+        val ar = AudioRecordModel(filename = MainActivity.filename, filePath = filePath, timestamp = timestamp, duration = "none")
+        MainActivity.id = ar.id
+        GlobalScope.launch{
+            val status = MainActivity.sqLiteHelper.insertAudioRecord(ar)
+            if(status > -1){
+                Log.e("test", "Audio Record added")
+            } else {
+                Log.e("test", "Audio Record not saved")
+            }
+        }
+    }
+
     fun showNotification(contentText: String){
 
         val notification = NotificationCompat.Builder(baseContext, ApplicationClass.CHANNEL_ID)
             .setContentTitle("Record")
             .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_mic)
-            .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.ic_largeiconservice))
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.ic_largeiconservice))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSilent(true)

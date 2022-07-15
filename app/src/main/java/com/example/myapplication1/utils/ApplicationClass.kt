@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.utils
 
 import android.app.Application
 import android.app.NotificationChannel

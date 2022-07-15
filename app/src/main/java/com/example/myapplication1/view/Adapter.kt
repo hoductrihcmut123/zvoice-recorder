@@ -1,11 +1,13 @@
-package com.example.myapplication1
+package com.example.myapplication1.view
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication1.utils.OnItemClickListener
+import com.example.myapplication1.R
+import com.example.myapplication1.database.model.AudioRecordModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -16,7 +18,6 @@ class Adapter(private var records : ArrayList<AudioRecordModel>, var listener: O
         var tvFilename : TextView = itemView.findViewById(R.id.tvFilename)
         var tvDuration : TextView = itemView.findViewById(R.id.tvDuration)
         var tvTimestamp : TextView = itemView.findViewById(R.id.tvTimestamp)
-        var checkbox : CheckBox = itemView.findViewById(R.id.checkbox)
 
         init {
             itemView.setOnClickListener(this)

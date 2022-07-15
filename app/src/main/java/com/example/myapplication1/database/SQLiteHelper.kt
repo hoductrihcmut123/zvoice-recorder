@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.database
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -6,6 +6,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.myapplication1.database.model.AudioRecordModel
 import java.lang.Exception
 
 class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -18,7 +19,6 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
         private const val FILEPATH = "filePath"
         private const val TIMESTAMP = "timestamp"
         private const val DURATION = "duration"
-        private const val AMPSPATH = "ampsPath"
 
     }
 
@@ -28,8 +28,7 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
                 + FILENAME + " TEXT,"
                 + FILEPATH + " TEXT,"
                 + TIMESTAMP + " INTEGER,"
-                + DURATION + " TEXT,"
-                + AMPSPATH + " TEXT" + ")"
+                + DURATION + " TEXT" + ")"
                 )
         db?.execSQL(createTblAudioRecords)
     }
@@ -48,7 +47,6 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
         contentValues.put(FILEPATH, ar.filePath)
         contentValues.put(TIMESTAMP, ar.timestamp)
         contentValues.put(DURATION, ar.duration)
-        contentValues.put(AMPSPATH, ar.ampsPath)
 
         val success = db.insert(TBL_AUDIO_RECORDS, null, contentValues)
         db.close()
@@ -77,7 +75,6 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
         var filePath: String
         var timestamp: Int
         var duration: String
-        var ampsPath: String
 
         if(cursor.moveToFirst()){
             do{
@@ -86,21 +83,33 @@ class SQLiteHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, n
                 filePath = cursor.getString(cursor.getColumnIndex("filePath"))
                 timestamp = cursor.getInt(cursor.getColumnIndex("timestamp"))
                 duration = cursor.getString(cursor.getColumnIndex("duration"))
-                ampsPath = cursor.getString(cursor.getColumnIndex("ampsPath"))
 
-                val ar = AudioRecordModel(id = id, filename = filename, filePath = filePath, timestamp = timestamp, duration = duration, ampsPath = ampsPath)
+                val ar = AudioRecordModel(id = id, filename = filename, filePath = filePath, timestamp = timestamp, duration = duration)
                 arList.add(ar)
             } while (cursor.moveToNext())
         }
         return arList
     }
 
-    fun updateAudioRecord(ar: AudioRecordModel): Int{
+    fun updateAudioRecordName(ar: AudioRecordModel): Int{
         val db = this.writableDatabase
 
         val contentValues = ContentValues()
         contentValues.put(ID, ar.id)
         contentValues.put(FILENAME, ar.filename)
+
+        val success = db.update(TBL_AUDIO_RECORDS, contentValues, "id=" + ar.id, null)
+        db.close()
+        return success
+    }
+
+    fun updateAudioRecordNameDuration(ar: AudioRecordModel): Int{
+        val db = this.writableDatabase
+
+        val contentValues = ContentValues()
+        contentValues.put(ID, ar.id)
+        contentValues.put(FILENAME, ar.filename)
+        contentValues.put(DURATION, ar.duration)
 
         val success = db.update(TBL_AUDIO_RECORDS, contentValues, "id=" + ar.id, null)
         db.close()

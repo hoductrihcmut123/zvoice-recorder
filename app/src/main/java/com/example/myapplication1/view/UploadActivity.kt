@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.view
 
 import android.content.Intent
 import android.graphics.Paint
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication1.R
 import com.example.myapplication1.databinding.ActivityUploadBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount

@@ -1,4 +1,4 @@
-package com.example.myapplication1
+package com.example.myapplication1.view
 
 import android.content.Context
 import android.content.Intent
@@ -14,6 +14,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myapplication1.utils.OnItemClickListener
+import com.example.myapplication1.R
+import com.example.myapplication1.database.SQLiteHelper
+import com.example.myapplication1.database.model.AudioRecordModel
 import com.example.myapplication1.databinding.ActivityGalleryBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -258,7 +262,7 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         }
 
         GlobalScope.launch(Dispatchers.IO) {
-            val  status = sqLiteHelper.updateAudioRecord(AudioRecordModel(id =  ar!!.id, filename = filename))
+            val  status = sqLiteHelper.updateAudioRecordName(AudioRecordModel(id =  ar!!.id, filename = filename))
             withContext(Dispatchers.Main) {
                 collapseThird()
                 binding.searchInput.text?.clear()
@@ -276,7 +280,6 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
     private fun deleteRecord(id: Int) {
         sqLiteHelper.deleteAudioRecordById(id)
         File("${ar?.filePath}").delete()
-        File("${ar?.ampsPath}").delete()
     }
 
     private fun signIn(){

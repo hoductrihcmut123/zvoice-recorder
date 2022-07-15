@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AudioPlayerActivity">
+    tools:context=".view.AudioPlayerActivity">
 
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -24,9 +24,9 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/img_zalo"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:src="@drawable/img_zalotechfresher"
         app:layout_constraintBottom_toTopOf="@+id/chip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

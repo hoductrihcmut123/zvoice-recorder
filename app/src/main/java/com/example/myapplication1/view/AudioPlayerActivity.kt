@@ -1,18 +1,17 @@
-package com.example.myapplication1
+package com.example.myapplication1.view
 
 import android.annotation.SuppressLint
 import android.content.*
 import android.media.MediaPlayer
 import android.media.PlaybackParams
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import android.util.Log
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.myapplication1.R
 import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
+import com.example.myapplication1.service.AudioPlayerService
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
@@ -163,8 +162,10 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
                 playbackSpeed = 0.5f
             }
 
-            audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
-            binding.chip.text = "x $playbackSpeed"
+            if (Build.VERSION.SDK_INT >= 23) {
+                audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
+                binding.chip.text = "x $playbackSpeed"
+            }
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
