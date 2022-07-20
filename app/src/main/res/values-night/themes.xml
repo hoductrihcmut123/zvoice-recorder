@@ -13,6 +13,8 @@
         <item name="android:statusBarColor">@color/statusBar</item>
         <item name="android:windowLightStatusBar">true</item>
         <!-- Customize your theme here. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
 
         <item name="rippleColor">@color/grayDarkDisable</item>
         <item name="android:textColor">@color/colorText</item>
