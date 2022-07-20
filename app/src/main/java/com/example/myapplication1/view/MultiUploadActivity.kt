@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication1.R
-import com.example.myapplication1.databinding.ActivityUploadBinding
+import com.example.myapplication1.databinding.ActivityMultiUploadBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -19,33 +19,34 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class UploadActivity : AppCompatActivity() {
+class MultiUploadActivity : AppCompatActivity() {
 
     private lateinit var gso : GoogleSignInOptions
     private lateinit var gsc : GoogleSignInClient
 
-    private lateinit var binding: ActivityUploadBinding
+    private lateinit var binding: ActivityMultiUploadBinding
 
-    private lateinit var filename: String
-    private lateinit var filePath: String
+    private var filenameList = ArrayList<String>()
+    private var filePathList = ArrayList<String>()
+    private var testPairList = ArrayList<Pair<String,String>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityUploadBinding.inflate(layoutInflater)
+        binding = ActivityMultiUploadBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        filePath = intent.getStringExtra("filePath").toString()
-        filename = intent.getStringExtra("filename").toString()
+        filenameList = intent.getStringArrayListExtra("filenameList") as ArrayList<String>
+        filePathList = intent.getStringArrayListExtra("filePathList") as ArrayList<String>
 
-        binding.documentTitleInputRename.setText(filename)
+        for (i in 0 until filenameList.size){
+            testPairList += Pair(filenameList[i],filePathList[i])
+        }
 
         gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
         gsc = GoogleSignIn.getClient(this, gso)
@@ -56,6 +57,13 @@ class UploadActivity : AppCompatActivity() {
             binding.accountName.text = personEmail
             binding.accountName.paintFlags = binding.accountName.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
+
+        var stringFilename = ""
+        val newLine = "\n"
+        for (i in 0 until filenameList.size){
+            stringFilename = "$stringFilename $newLine ${filenameList[i]}"
+        }
+        binding.tvDocumentTitles.text = stringFilename
 
         binding.btnCancelUpload.setOnClickListener {
             signOut()
@@ -106,7 +114,6 @@ class UploadActivity : AppCompatActivity() {
                 try {
                     var isExist = false
                     var folderId = ""
-
                     var pageToken: String? = null
                     do {
                         val result: FileList = googleDriveService.files().list()
@@ -132,12 +139,25 @@ class UploadActivity : AppCompatActivity() {
                         folderId = file.id
                     }
 
-                    val actualFile = File(filePath)
-                    val gFile = com.google.api.services.drive.model.File()
-                    gFile.name = binding.documentTitleInputRename.text.toString()
-                    gFile.parents = Collections.singletonList(folderId)
-                    val fileContent = FileContent("audio/MP3", actualFile)
-                    googleDriveService.Files().create(gFile,fileContent).execute()
+//                    // sequential
+//                    for (i in 0 until filenameList.size){
+//                        val actualFile = File(filePathList[i])
+//                        val gFile = com.google.api.services.drive.model.File()
+//                        gFile.name = filenameList[i]
+//                        gFile.parents = Collections.singletonList(folderId)
+//                        val fileContent = FileContent("audio/MP3", actualFile)
+//                        googleDriveService.Files().create(gFile,fileContent).execute()
+//                    }
+
+                    // parallel
+                    testPairList.forEachParallel {
+                        val actualFile = File(it.second)
+                        val gFile = com.google.api.services.drive.model.File()
+                        gFile.name = it.first
+                        gFile.parents = Collections.singletonList(folderId)
+                        val fileContent = FileContent("audio/MP3", actualFile)
+                        googleDriveService.Files().create(gFile,fileContent).execute()
+                    }
                 }catch ( e: Exception){
                     e.printStackTrace()
                     isSuccessful = false
@@ -147,12 +167,17 @@ class UploadActivity : AppCompatActivity() {
                     binding.BG.visibility = View.GONE
                     binding.progressBarUpload.visibility = View.GONE
                     if (isSuccessful){
-                        Toast.makeText(this@UploadActivity, "File upload successful", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MultiUploadActivity, "File upload successful", Toast.LENGTH_SHORT).show()
                     } else{
-                        Toast.makeText(this@UploadActivity, "File upload failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MultiUploadActivity, "File upload failed", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
+
+    private fun <A>Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit = runBlocking {
+        map { async(Dispatchers.Default) { f(it) } }.forEach { it.await() }
+    }
+
 }

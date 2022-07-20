@@ -7,6 +7,7 @@
     tools:context=".view.GalleryActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -23,10 +24,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:title="Recordings"
-                app:layout_collapseMode="pin"/>
+                app:layout_collapseMode="pin" />
+
+            <ImageButton
+                android:id="@+id/checklist"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="35dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_checklist"
+                android:background="@drawable/ic_ripple"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/tvCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:textColor="#4D4DFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="end"
+                android:layout_marginEnd="30dp"
+                android:layout_marginTop="68dp"
+                android:visibility="gone"/>
+
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:hintEnabled="false"
@@ -43,6 +70,7 @@
             app:boxCornerRadiusTopStart="36dp"
             app:endIconMode="clear_text"
             app:startIconDrawable="@drawable/ic_search"
+            android:visibility="visible"
             style="@style/SearchInputStyle">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/search_input"
@@ -54,8 +82,86 @@
                 android:textColor="@color/colorText"
                 android:textColorHint="@color/grayDark"
                 android:imeOptions="actionSearch" />
+
         </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageButton
+            android:id="@+id/btnMultipleDelete"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_delete_gallery"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnMultipleUpload"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_upload"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnMultipleDelete"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnMultipleDelete" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView4"
+            app:layout_constraintTop_toBottomOf="@+id/btnMultipleUpload" />
+
+        <TextView
+            android:id="@+id/selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 Selected"
+            android:textColor="#4D4DFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnMultipleDelete"
+            app:layout_constraintHorizontal_bias="0.3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0" />
+
+        <ImageButton
+            android:id="@+id/btnSelectAll"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_select_all"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnMultipleDelete"
+            app:layout_constraintHorizontal_bias="0.11"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -95,5 +201,9 @@
     <include
         android:id="@+id/bottomSheetRename"
         layout="@layout/bottom_sheet_rename" />
+
+    <include
+        android:id="@+id/bottomSheetMultiDelete"
+        layout="@layout/bottom_sheet_multi_delete" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

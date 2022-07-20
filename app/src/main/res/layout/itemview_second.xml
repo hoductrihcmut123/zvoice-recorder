@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout_itemView_second"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
@@ -12,27 +13,30 @@
     android:focusable="true">
 
     <ImageButton
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:id="@+id/checkbox"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:clickable="false"
-        android:background="@drawable/ic_circle"
-        android:src="@drawable/ic_play"
+        android:background="@drawable/ic_uncheck"
         android:layout_marginEnd="20dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/tvFilename"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="17sp"
             android:text="filename field"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/tvDuration"
                 android:layout_width="wrap_content"
@@ -41,6 +45,7 @@
                 android:textColor="@color/grayDark"
                 android:layout_marginEnd="5dp"
                 android:text="duration field"/>
+
             <TextView
                 android:id="@+id/tvTimestamp"
                 android:layout_width="wrap_content"
@@ -49,7 +54,9 @@
                 android:textColor="@color/grayDark"
                 android:layout_marginStart="5dp"
                 android:text="timestamp field"/>
+
         </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

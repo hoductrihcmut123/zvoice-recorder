@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".view.UploadActivity"
+    tools:context=".view.MultiUploadActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,7 +14,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".view.UploadActivity">
+            tools:context=".view.MultiUploadActivity">
 
             <TextView
                 android:id="@+id/title"
@@ -42,29 +42,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="45dp"
-                android:text="Document title"
+                android:text="Document titles"
                 android:textSize="18sp"
                 android:textColor="@color/grayDark"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvDocumentTitles"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="document title 1"
+                android:textSize="18sp"
+                android:textStyle="bold|italic"
+                android:layout_marginStart="25dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/documentTitle"
-                app:boxBackgroundColor="@color/white">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/documentTitleInputRename"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="23sp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintTop_toBottomOf="@+id/documentTitle">
+            </TextView>
 
             <TextView
                 android:id="@+id/account"
@@ -76,7 +70,7 @@
                 android:textSize="18sp"
                 android:textColor="@color/grayDark"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textInputLayout" />
+                app:layout_constraintTop_toBottomOf="@id/tvDocumentTitles" />
 
             <TextView
                 android:id="@+id/accountName"
@@ -104,7 +98,7 @@
                 app:layout_constraintHorizontal_bias="0.2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/accountName"
-                app:layout_constraintVertical_bias="0.03"
+                app:layout_constraintVertical_bias="0.05"
                 app:rippleColor="@color/grayDark" />
 
             <com.google.android.material.button.MaterialButton
@@ -122,7 +116,7 @@
                 app:layout_constraintHorizontal_bias="0.8"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/accountName"
-                app:layout_constraintVertical_bias="0.03"
+                app:layout_constraintVertical_bias="0.05"
                 app:rippleColor="@color/grayDark" />
 
             <com.google.android.material.button.MaterialButton
@@ -140,7 +134,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/accountName"
-                app:layout_constraintVertical_bias="0.03"
+                app:layout_constraintVertical_bias="0.05"
                 app:rippleColor="@color/grayDark" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

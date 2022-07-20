@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bottomSheetDelete"
+    android:id="@+id/bottomSheetMultiDelete"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,6 +9,7 @@
     android:background="@drawable/background_round">
 
     <TextView
+        android:id="@+id/bottomSheetMultiDeleteTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Are you sure you want to delete this recording file?"
@@ -24,8 +25,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginBottom="20dp">
+
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancelDelete"
+            android:id="@+id/btnCancelMultiDelete"
             android:layout_width="120dp"
             android:layout_height="55dp"
             android:text="cancel"
@@ -35,7 +37,7 @@
             app:rippleColor="@color/grayDark"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOkDelete"
+            android:id="@+id/btnOkMultiDelete"
             android:layout_width="120dp"
             android:layout_height="55dp"
             android:layout_marginStart="30dp"

@@ -26,9 +26,12 @@
         android:theme="@style/Theme.MyApplication1"
         tools:targetApi="31">
         <activity
+            android:name=".view.MultiUploadActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.UploadActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.AudioPlayerActivity"
             android:exported="false" />

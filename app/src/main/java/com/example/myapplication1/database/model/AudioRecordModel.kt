@@ -12,7 +12,7 @@ data class AudioRecordModel(
     companion object{
         fun getAutoId(): Int{
             val random = Random()
-            return random.nextInt(100)
+            return random.nextInt(10000)
         }
     }
 }
