@@ -1,10 +1,10 @@
 package com.example.myapplication1.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,12 +15,13 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapplication1.utils.OnItemClickListener
 import com.example.myapplication1.R
 import com.example.myapplication1.database.SQLiteHelper
 import com.example.myapplication1.database.model.AudioRecordModel
 import com.example.myapplication1.databinding.ActivityGalleryBinding
+import com.example.myapplication1.utils.OnItemClickListener
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -33,6 +34,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+
 
 class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 

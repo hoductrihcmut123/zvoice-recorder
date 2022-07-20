@@ -119,6 +119,14 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             startActivity(Intent(this, GalleryActivity::class.java))
         }
 
+        binding.btnSwitch.setOnClickListener{
+            if(binding.btnSwitch.isChecked){
+                binding.btnCrashTest.visibility = View.VISIBLE
+            } else {
+                binding.btnCrashTest.visibility = View.GONE
+            }
+        }
+
         // button crash test
         binding.btnCrashTest.setOnClickListener {
             val crash = 5 / 0
