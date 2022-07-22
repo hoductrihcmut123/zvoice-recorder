@@ -18,6 +18,7 @@ import com.example.myapplication1.database.model.AudioRecordModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,6 +53,8 @@ class RecordingService : Service() {
 
         MainActivity.sqLiteHelper = SQLiteHelper(this)
 
+        MainActivity.binding.btnRecord.isClickable = false
+
         recorder.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -68,21 +71,23 @@ class RecordingService : Service() {
 
         GlobalScope.launch(Dispatchers.IO) {
             save()
+            withContext(Dispatchers.Main){
+                MainActivity.binding.btnRecord.setImageResource(R.drawable.ic_pause)
+                MainActivity.binding.btnRecord.isClickable = true
+                MainActivity.isRecording = true
+                MainActivity.isPaused = false
+
+                MainActivity.binding.waveformView2.start()
+
+                MainActivity.timer.start()
+
+                MainActivity.binding.btnDelete.isClickable = true
+                MainActivity.binding.btnDelete.setImageResource(R.drawable.ic_delete)
+
+                MainActivity.binding.btnDone.visibility = View.VISIBLE
+                MainActivity.binding.btnList.visibility = View.GONE
+            }
         }
-
-        MainActivity.binding.btnRecord.setImageResource(R.drawable.ic_pause)
-        MainActivity.isRecording = true
-        MainActivity.isPaused = false
-
-        MainActivity.binding.waveformView2.start()
-
-        MainActivity.timer.start()
-
-        MainActivity.binding.btnDelete.isClickable = true
-        MainActivity.binding.btnDelete.setImageResource(R.drawable.ic_delete)
-
-        MainActivity.binding.btnDone.visibility = View.VISIBLE
-        MainActivity.binding.btnList.visibility = View.GONE
 
         return START_NOT_STICKY
     }

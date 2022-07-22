@@ -196,7 +196,6 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
     override fun onDestroy() {
         super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        audioPlayerService!!.stopForeground(true)
         audioPlayerService = null
         unbindService(this)
         stopService(intent)

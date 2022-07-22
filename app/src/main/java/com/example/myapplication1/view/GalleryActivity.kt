@@ -426,7 +426,8 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             } catch (e: ApiException) {
                 filenameList.clear()
                 filePathList.clear()
-                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         }
     }
