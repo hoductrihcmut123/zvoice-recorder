@@ -155,16 +155,18 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         }
 
         binding.chip.setOnClickListener{
-            if (playbackSpeed != 2f) {
-                playbackSpeed += 0.5f
-            }
-            else {
-                playbackSpeed = 0.5f
-            }
+            if(isPlaying){
+                if (playbackSpeed != 2f) {
+                    playbackSpeed += 0.5f
+                }
+                else {
+                    playbackSpeed = 0.5f
+                }
 
-            if (Build.VERSION.SDK_INT >= 23) {
-                audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
-                binding.chip.text = "x $playbackSpeed"
+                if (Build.VERSION.SDK_INT >= 23) {
+                    audioPlayerService!!.mediaPlayer!!.playbackParams = PlaybackParams().setSpeed(playbackSpeed)
+                    binding.chip.text = "x $playbackSpeed"
+                }
             }
         }
 
@@ -194,6 +196,10 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
     override fun onDestroy() {
         super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        audioPlayerService!!.stopForeground(true)
+        audioPlayerService = null
+        unbindService(this)
+        stopService(intent)
     }
 
 }

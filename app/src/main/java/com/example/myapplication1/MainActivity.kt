@@ -369,4 +369,12 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         stopService(intent)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        recordingService!!.stopForeground(true)
+        recordingService = null
+        unbindService(connection)
+        stopService(intent)
+    }
+
 }
