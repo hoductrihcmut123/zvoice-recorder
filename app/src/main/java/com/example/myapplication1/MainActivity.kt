@@ -104,15 +104,6 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
                 isRecording -> pauseRecording()
                 else -> startRecording()
             }
-
-            if (Build.VERSION.SDK_INT >= 26) {
-                vibrator.vibrate(
-                    VibrationEffect.createOneShot(
-                        50,
-                        VibrationEffect.DEFAULT_AMPLITUDE
-                    )
-                )
-            }
         }
 
         binding.btnList.setOnClickListener {
@@ -255,6 +246,15 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             binding.btnRecord.setImageResource(R.drawable.ic_pause)
             timer.start()
 
+            if (Build.VERSION.SDK_INT >= 26) {
+                vibrator.vibrate(
+                    VibrationEffect.createOneShot(
+                        15,
+                        VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+                )
+            }
+
             GlobalScope.launch(Dispatchers.Default) {
                 isPaused = false
                 recordingService!!.recorder.resume()
@@ -270,6 +270,16 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             }, 100)
             return
         }
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(
+                VibrationEffect.createOneShot(
+                    15,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        }
+
         // start recordingService here
 
         intent = Intent(this, RecordingService::class.java)
