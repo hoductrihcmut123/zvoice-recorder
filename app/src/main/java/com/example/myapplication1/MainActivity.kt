@@ -371,11 +371,11 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(recordingService!!.recorder != null){
-            isPaused = false
-            isRecording = false
-            recordingService!!.recorder.release()
-        }
+
+        isPaused = false
+        isRecording = false
+        recordingService!!.recorder.release()
+
         recordingService!!.stopForeground(true)
         recordingService = null
         unbindService(connection)

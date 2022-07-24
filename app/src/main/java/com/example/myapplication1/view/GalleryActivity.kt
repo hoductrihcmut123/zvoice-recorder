@@ -1,6 +1,5 @@
 package com.example.myapplication1.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -426,8 +425,8 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             } catch (e: ApiException) {
                 filenameList.clear()
                 filePathList.clear()
-                Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
-                //Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         }
     }
