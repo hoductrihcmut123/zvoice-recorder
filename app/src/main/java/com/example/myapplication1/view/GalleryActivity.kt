@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
@@ -143,6 +144,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
         binding.bottomSheetGalleryBG.setOnClickListener {
             collapseFirst()
+            binding.searchInput.isEnabled = true
+            binding.searchInput.inputType = InputType.TYPE_CLASS_TEXT
+            binding.checklist.isClickable = true
         }
 
         binding.bottomSheetDeleteBG.setOnClickListener {}
@@ -157,6 +161,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
         binding.bottomSheetDelete.btnCancelDelete.setOnClickListener {
             collapseSecond()
+            binding.searchInput.isEnabled = true
+            binding.searchInput.inputType = InputType.TYPE_CLASS_TEXT
+            binding.checklist.isClickable = true
         }
 
         binding.bottomSheetDelete.btnOkDelete.setOnClickListener {
@@ -166,6 +173,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
                 withContext(Dispatchers.Main) {
                     fetchAll()
                     collapseSecond()
+                    binding.searchInput.isEnabled = true
+                    binding.searchInput.inputType = InputType.TYPE_CLASS_TEXT
+                    binding.checklist.isClickable = true
                     binding.searchInput.text?.clear()
                     Toast.makeText(this@GalleryActivity, "Deleted successfully", Toast.LENGTH_SHORT)
                         .show()
@@ -185,10 +195,16 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
 
         binding.bottomSheetRename.btnCancelRename.setOnClickListener {
             collapseThird()
+            binding.searchInput.isEnabled = true
+            binding.searchInput.inputType = InputType.TYPE_CLASS_TEXT
+            binding.checklist.isClickable = true
         }
 
         binding.bottomSheetRename.btnOkRename.setOnClickListener {
             renameRecord()
+            binding.searchInput.isEnabled = true
+            binding.searchInput.inputType = InputType.TYPE_CLASS_TEXT
+            binding.checklist.isClickable = true
         }
 
         binding.bottomSheetGallery.btnUpload.setOnClickListener {
@@ -240,6 +256,11 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
                 binding.bottomSheetDeleteBG.visibility = View.VISIBLE
                 binding.bottomSheetMultiDelete.bottomSheetMultiDeleteTitle.text =
                     "Are you sure you want to delete ${MultiSelectAdapter.itemSelectedList.size} items?"
+
+                binding.tvCancel.isClickable = false
+                binding.btnMultipleDelete.isClickable = false
+                binding.btnMultipleUpload.isClickable = false
+                binding.btnSelectAll.isClickable = false
             }
         }
 
@@ -259,12 +280,21 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
                     ).show()
                     cancelChecklist()
                     fetchAll()
+
+                    binding.tvCancel.isClickable = true
+                    binding.btnMultipleDelete.isClickable = true
+                    binding.btnMultipleUpload.isClickable = true
+                    binding.btnSelectAll.isClickable = true
                 }
             }
         }
 
         binding.bottomSheetMultiDelete.btnCancelMultiDelete.setOnClickListener {
             collapseMultiDelete()
+            binding.tvCancel.isClickable = true
+            binding.btnMultipleDelete.isClickable = true
+            binding.btnMultipleUpload.isClickable = true
+            binding.btnSelectAll.isClickable = true
         }
 
         binding.btnMultipleUpload.setOnClickListener {
@@ -318,6 +348,9 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
         //Toast.makeText(this, "Long Click", Toast.LENGTH_SHORT).show()
         hideKeyboard(binding.searchInput)
         Handler(Looper.getMainLooper()).postDelayed({
+            binding.searchInput.isEnabled = false
+            binding.searchInput.inputType = InputType.TYPE_NULL
+            binding.checklist.isClickable = false
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             binding.bottomSheetGalleryBG.visibility = View.VISIBLE
             binding.bottomSheetGallery.filenameGallery.text = recordsTemp[position].filename
@@ -425,6 +458,7 @@ class GalleryActivity : AppCompatActivity(), OnItemClickListener {
             } catch (e: ApiException) {
                 filenameList.clear()
                 filePathList.clear()
+                hideKeyboard(binding.searchInput)
                 //Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
             }

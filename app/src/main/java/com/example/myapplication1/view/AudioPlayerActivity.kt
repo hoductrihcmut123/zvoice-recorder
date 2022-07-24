@@ -9,9 +9,13 @@ import android.util.Log
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.myapplication1.MainActivity
 import com.example.myapplication1.R
 import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
 import com.example.myapplication1.service.AudioPlayerService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
@@ -72,14 +76,18 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
             isPlaying = true
             audioPlayerService!!.mediaPlayer!!.start()
             binding.btnPlay.setImageResource(R.drawable.ic_pause_circle)
-            audioPlayerService!!.showNotification(R.drawable.ic_pausebig)
             handler.postDelayed(runnable, delay)
+            GlobalScope.launch(Dispatchers.Default) {
+                audioPlayerService!!.showNotification(R.drawable.ic_pausebig)
+            }
         }else {
             isPlaying = false
             audioPlayerService!!.mediaPlayer!!.pause()
             binding.btnPlay.setImageResource(R.drawable.ic_play_circle)
-            audioPlayerService!!.showNotification(R.drawable.ic_playbig)
             handler.removeCallbacks(runnable)
+            GlobalScope.launch(Dispatchers.Default) {
+                audioPlayerService!!.showNotification(R.drawable.ic_playbig)
+            }
         }
     }
 
