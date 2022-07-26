@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/documentTitle"
-                app:boxBackgroundColor="@color/white">
+                app:boxBackgroundColor="?android:attr/color">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/documentTitleInputRename"
                     android:layout_width="match_parent"

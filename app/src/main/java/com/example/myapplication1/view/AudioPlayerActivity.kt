@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.myapplication1.MainActivity
 import com.example.myapplication1.R
 import com.example.myapplication1.databinding.ActivityAudioPlayerBinding
 import com.example.myapplication1.service.AudioPlayerService
@@ -143,6 +142,7 @@ class AudioPlayerActivity : AppCompatActivity(), ServiceConnection {
         binding.seekBar.max = audioPlayerService!!.mediaPlayer!!.duration
 
         audioPlayerService!!.mediaPlayer!!.setOnCompletionListener {
+            isPlaying = false
             binding.btnPlay.setImageResource(R.drawable.ic_play_circle)
             audioPlayerService!!.showNotification(R.drawable.ic_playbig)
             handler.removeCallbacks(runnable, delay)

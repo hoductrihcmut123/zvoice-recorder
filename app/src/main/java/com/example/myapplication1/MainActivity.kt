@@ -136,13 +136,19 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         val newFilename = binding.bottomSheet.filenameInput.text.toString()
 
         GlobalScope.launch(Dispatchers.IO) {
+            val mediaPlayer = MediaPlayer()
+            mediaPlayer.apply {
+                setDataSource("${dirPath}${filename}.mp3")
+                prepare()
+            }
             val status = sqLiteHelper.updateAudioRecordNameDuration(
                 AudioRecordModel(
                     id = id,
                     filename = newFilename,
-                    duration = duration
+                    duration = dateFormat(mediaPlayer.duration)
                 )
             )
+            mediaPlayer.release()
             withContext(Dispatchers.Main) {
                 collapse()
                 if (status > -1) {
@@ -249,7 +255,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             if (Build.VERSION.SDK_INT >= 26) {
                 vibrator.vibrate(
                     VibrationEffect.createOneShot(
-                        15,
+                        25,
                         VibrationEffect.DEFAULT_AMPLITUDE
                     )
                 )
@@ -318,7 +324,9 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     override fun onTimerTick(duration: String) {
         binding.tvTimer.text = duration
         this.duration = duration.dropLast(3)
-        binding.waveformView1.addAmplitude(recordingService!!.recorder.maxAmplitude.toFloat())
+        if(recordingService?.recorder != null){
+            binding.waveformView1.addAmplitude(recordingService!!.recorder.maxAmplitude.toFloat())
+        }
     }
 
     private val connection = object : ServiceConnection {
@@ -382,14 +390,17 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     override fun onDestroy() {
         super.onDestroy()
 
-        isPaused = false
-        isRecording = false
-        recordingService!!.recorder.release()
+        if(recordingService != null){
+            isPaused = false
+            isRecording = false
+            recordingService!!.recorder.release()
+            timer.stop()
 
-        recordingService!!.stopForeground(true)
-        recordingService = null
-        unbindService(connection)
-        stopService(intent)
+            recordingService!!.stopForeground(true)
+            recordingService = null
+            unbindService(connection)
+            stopService(intent)
+        }
     }
 
 }

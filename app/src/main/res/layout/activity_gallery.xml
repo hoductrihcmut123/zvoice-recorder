@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:hintEnabled="false"
-            app:boxBackgroundColor="@color/gray"
+            app:boxBackgroundColor="?android:attr/colorActivatedHighlight"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp"
             android:layout_marginStart="20dp"
@@ -79,8 +79,8 @@
                 android:hint="Search audio record"
                 android:inputType="text"
                 android:textSize="15sp"
-                android:textColor="@color/colorText"
-                android:textColorHint="@color/grayDark"
+                android:textColor="?android:attr/textColor"
+                android:textColorHint="?android:attr/colorControlNormal"
                 android:imeOptions="actionSearch" />
 
         </com.google.android.material.textfield.TextInputLayout>

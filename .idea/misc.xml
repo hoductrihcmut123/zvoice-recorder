@@ -5,6 +5,7 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1645" />
+        <entry key="app/src/main/res/drawable/background_round.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/backround_round.xml" value="0.185" />
         <entry key="app/src/main/res/drawable/ic_audio.xml" value="0.16" />
         <entry key="app/src/main/res/drawable/ic_audiotrack.xml" value="0.183" />
@@ -35,12 +36,13 @@
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.276" />
         <entry key="app/src/main/res/drawable/ic_select_all.xml" value="0.176" />
         <entry key="app/src/main/res/drawable/ic_square.xml" value="0.307" />
-        <entry key="app/src/main/res/layout/activity_audio_player.xml" value="0.25427350427350426" />
-        <entry key="app/src/main/res/layout/activity_gallery.xml" value="0.335" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/drawable/ic_upload.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_audio_player.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_gallery.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_multi_upload.xml" value="0.25427350427350426" />
         <entry key="app/src/main/res/layout/activity_upload.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.3833419799804688" />
+        <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.1" />
         <entry key="app/src/main/res/layout/bottom_sheet_delete.xml" value="0.3261603375527426" />
         <entry key="app/src/main/res/layout/bottom_sheet_gallery.xml" value="0.3261603375527426" />
         <entry key="app/src/main/res/layout/bottom_sheet_multi_delete.xml" value="0.1" />
