@@ -255,7 +255,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             if (Build.VERSION.SDK_INT >= 26) {
                 vibrator.vibrate(
                     VibrationEffect.createOneShot(
-                        25,
+                        30,
                         VibrationEffect.DEFAULT_AMPLITUDE
                     )
                 )
