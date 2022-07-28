@@ -35,9 +35,8 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
     companion object {
         private var permissions =
-            arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            arrayOf(Manifest.permission.RECORD_AUDIO)
         private var permissionGrantedAudio = false
-        private var permissionGrantedWrite = false
 
         private lateinit var amplitudes: ArrayList<Float>
 
@@ -74,15 +73,10 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
             permissions[0]
         ) == PackageManager.PERMISSION_GRANTED
 
-        permissionGrantedWrite = ActivityCompat.checkSelfPermission(
-            this,
-            permissions[1]
-        ) == PackageManager.PERMISSION_GRANTED
-
         timer = Timer(this)
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-        if (!(permissionGrantedAudio and permissionGrantedWrite)) {
+        if (!permissionGrantedAudio) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
         }
 
@@ -228,7 +222,6 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
 
         if (requestCode == REQUEST_CODE) {
             permissionGrantedAudio = grantResults[0] == PackageManager.PERMISSION_GRANTED
-            permissionGrantedWrite = grantResults[1] == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -270,7 +263,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
     }
 
     private fun startRecording() {
-        if (!(permissionGrantedAudio and permissionGrantedWrite)) {
+        if (!permissionGrantedAudio) {
             Handler().postDelayed({
                 ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE)
             }, 100)
@@ -280,7 +273,7 @@ class MainActivity : AppCompatActivity(), Timer.OnTimeTickListener {
         if (Build.VERSION.SDK_INT >= 26) {
             vibrator.vibrate(
                 VibrationEffect.createOneShot(
-                    15,
+                    30,
                     VibrationEffect.DEFAULT_AMPLITUDE
                 )
             )
