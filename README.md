@@ -1,6 +1,5 @@
-![image](https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/f6d37ab5-38d3-423f-92fd-19d848997110)# zvoice-recorder
+# zvoice-recorder
 ## Android, Kotlin
-
 
 
 ## Requirements
