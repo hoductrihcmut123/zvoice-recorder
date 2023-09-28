@@ -18,21 +18,21 @@
 
 ## Record một voice mới
 
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/3a83eff2-2de8-4e6b-902e-06bf95ff2f98" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/02f727e6-0cb6-4660-8039-9a5695ee0d59" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/932794b2-028c-4700-b075-56bbc7d631f8" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/00bab9d6-e8c4-4ce7-8c0d-76273e2b599e" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/04fa45fd-3726-4ab0-a64c-c8b31a7f986e" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/a397c6f9-d70e-4fe0-925d-50243644c38a" width="150">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/a574a1e6-22a0-4384-b8e6-a370926765c3" width="150">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/3a83eff2-2de8-4e6b-902e-06bf95ff2f98" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/02f727e6-0cb6-4660-8039-9a5695ee0d59" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/932794b2-028c-4700-b075-56bbc7d631f8" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/00bab9d6-e8c4-4ce7-8c0d-76273e2b599e" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/04fa45fd-3726-4ab0-a64c-c8b31a7f986e" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/a397c6f9-d70e-4fe0-925d-50243644c38a" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/a574a1e6-22a0-4384-b8e6-a370926765c3" width="175">
 
 
 ## Record liên tục 
 
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/229405fe-3b7f-492d-aaad-075b09cee903" width="200">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/c742f423-c077-4e86-8f61-f6a75b18bced" width="200">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/ec94857f-b860-4d50-9497-50fa38c40bd3" width="200">
- <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/f4568d0f-fa56-4edd-8e1d-cb61862f6c4f" width="200">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/229405fe-3b7f-492d-aaad-075b09cee903" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/c742f423-c077-4e86-8f61-f6a75b18bced" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/ec94857f-b860-4d50-9497-50fa38c40bd3" width="175">
+ <img src="https://github.com/hoductrihcmut123/zvoice-recorder/assets/76983358/f4568d0f-fa56-4edd-8e1d-cb61862f6c4f" width="175">
 
 
 ## Quản lý danh sách các file
